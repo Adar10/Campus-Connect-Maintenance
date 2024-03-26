@@ -17,8 +17,41 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+/*
 // Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '../public', 'frame1.html')));
+*/
+
+// Handle file upload
+app.post('/upload', upload.array('files'), (req, res) => {
+    res.send('Files uploaded successfully');
+});
+
+// Define a route handler for the root URL ("/")
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'frame1.html'));
+});
+
+// Serve different HTML files based on the request URL
+app.get('/frame1.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'frame1.html'));
+});
+
+app.get('/frame2.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'frame2.html'));
+});
+
+app.get('/frame3.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'frame3.html'));
+});
+
+app.get('/frame4.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'frame4.html'));
+});
+
+app.get('/frame5.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public', 'frame5.html'));
+});
 
 // Handle file upload
 app.post('/upload', upload.array('files'), (req, res) => {
