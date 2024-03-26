@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<html>
+<head>
+<title>Upload</title>
+<script type="module" src="databse.js">
+</script>
+</head>
+
+<style>
+h1, h2 {
+    text-align: center;
+}
+form  {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+}
+label {
+    display: table-row;
+}
+input {
+    display: table-row;
+    box-sizing: border-box;
+}
+.btn {
+    padding: 5px;
+    width: 40px;
+    font-size: 20px;
+}
+
+</style>
+
+<body>
+
+<button class="btn"  onclick="location.href='frame1.html';"><i class="fa fa-home"></i></button>
+<h1>Campus Connect</h1>
+<h2>Upload material to our database</h2>
+
+<form>
+    <label for="ffile">File</label>
+    <input type="file" id="ffile" name="ffile"><br><br>
+    <label for="fname">Name of file:</label>
+    <input type="text" id="fname" name="fname"><br><br>
+    <input type="submit" value="Submit">
+</form>
+
+<button onclick="location.href='frame3.html';">Login</button>
+
+</body>
+</html>

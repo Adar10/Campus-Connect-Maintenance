@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<html>
+<head>
+<title>Login</title>
+<script type="module" src="databse.js"></script>
+</head>
+<style>
+    h1, p {
+        text-align: center;
+    }
+    form  {
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    label {
+        display: table-row;
+    }
+    input {
+        display: table-row;
+        padding: 6px 20px;
+        margin: 2px;
+        box-sizing: border-box;
+    }
+    .btn {
+        padding: 5px;
+        font-size: 20px;
+    }
+    nav {
+        text-align: center;
+    }
+    p {
+        font-size:x-large;
+    }
+    
+</style>
+<body>
+<button class="btn" onclick="location.href='frame1.html';"><i class="fa fa-home"></i></button>
+
+<h1>Campus Connect</h1>
+<p>Log in using a google account.</p>
+
+<nav>
+    <button class="btn" id="googleSignInButton">Google login</button>
+    <button class="btn" id="googleSignOutButton">Google sign out</button>
+</nav>
+<p id='login_info' style='display: block'>You're logged in</p>     
+
+
+</body>
+</html>
