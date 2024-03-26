@@ -15,10 +15,15 @@ const firebaseConfig = {
   measurementId: "G-YRMP4KDMNX"
 };
 
-const app = initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
+
+export { signInWithGoogle, signOutWithGoogle, createDocument, readDocuments, updateDocument, deleteDocument, onAuthStateChanged };
+export { auth, db }; // Exporting auth and db objects for other functionalities
 
 
 const auth = getAuth(firebaseApp);
+
+const db = getFirestore();
 
 function signInWithGoogle() { 
     const GoogleProvider = new GoogleAuthProvider(); 
@@ -43,8 +48,6 @@ auth.onAuthStateChanged((user) => {
         console.log("User is signed out");
     }
 })
-
-const db = getFirestore();
 
 // Create a document
 async function createDocument(collectionName, data) {
