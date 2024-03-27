@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, getAuth, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-
 
 
 const firebaseConfig = {
@@ -16,10 +15,6 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
-
-export { signInWithGoogle, signOutWithGoogle, createDocument, readDocuments, updateDocument, deleteDocument, onAuthStateChanged };
-export { auth, db }; // Exporting auth and db objects for other functionalities
-
 
 const auth = getAuth(firebaseApp);
 
@@ -42,12 +37,30 @@ function signOutWithGoogle() {
 }
 
 auth.onAuthStateChanged((user) => {
-    if(user) {
-        console.log("User is signed in");
-    } else {
-        console.log("User is signed out");
-    }
+  if(user) {
+      console.log("User is signed in");
+  } else {
+    console.log("User is signed out");
+  }
 })
+
+window.addEventListener('DOMContentLoaded', (event) => {
+  // Now you can safely use `createDocument` in your HTML
+  document.getElementById("clickme").addEventListener("click", async function() {
+      try {
+        const data = {
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          age: 30,
+      };
+    
+      const docRef = await addDoc(collection(db, "test"), data);
+      console.log("Document created", docRef.id);
+  } catch (error) {
+      console.error("Error creating document", error);
+  }
+  });
+});
 
 // Create a document
 async function createDocument(collectionName, data) {
@@ -94,5 +107,4 @@ async function deleteDocument(collectionName, docId) {
     console.error("Error deleting: ", error);
   }
 }
-
 

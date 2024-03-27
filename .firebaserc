@@ -1,8 +1,7 @@
 {
   "projects": {
     "default": "campusconnect-30c4a",
-    "test": "test-a379d",
-    "backend": "campusconnect-30c4a"
+    "Campus": "campusconnect-30c4a"
   },
   "targets": {},
   "etags": {}

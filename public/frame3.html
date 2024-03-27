@@ -3,7 +3,6 @@
 <html>
 <head>
 <title>Login</title>
-<script type="module" src="../src/index.js"></script>
 </head>
 <style>
     h1, p {
@@ -36,17 +35,47 @@
     
 </style>
 <body>
-<button class="btn" onclick="location.href='frame1.html';"><i class="fa fa-home"></i></button>
+<button class="btn" onclick="location.href='index.html';"><i class="fa fa-home"></i></button>
 
 <h1>Campus Connect</h1>
 <p>Log in using a google account.</p>
 
 <nav>
-    <button class="btn" id="googleSignInButton">Google login</button>
-    <button class="btn" id="googleSignOutButton">Google sign out</button>
+    <button id="googleSignInButton">Google login</button>
+    <button id="googleSignOutButton">Google sign out</button>
 </nav>
-<p id='login_info' style='display: block'>You're logged in</p>     
+<p id='login_info' style='display: block'>You're logged in</p>   
 
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
+<script>
+    var firebaseConfig = {
+        apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
+        authDomain: "campusconnect-30c4a.firebaseapp.com",
+        databaseURL: "https://campusconnect-30c4a-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "campusconnect-30c4a",
+        storageBucket: "campusconnect-30c4a.appspot.com",
+        messagingSenderId: "728123265116",
+        appId: "1:728123265116:web:2d24f83a222e156fe4d699",
+        measurementId: "G-YRMP4KDMNX"
+    };
+    firebase.initializeApp(firebaseConfig);
+</script>
+  
+<script>
+    function googleSignIn() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider).then(function(result) {
+        var user = result.user;
+        document.getElementById('login_info').textContent = "You're logged in as " + user.displayName;
+      }).catch(function(error) {
+        console.error(error);
+      });
+    }
+    document.getElementById('googleSignInButton').addEventListener('click', googleSignIn);
+</script>
+
+<script type="module" src="bundle.js"></script>
 
 </body>
 </html>
