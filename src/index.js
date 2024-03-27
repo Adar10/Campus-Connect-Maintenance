@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 
@@ -16,51 +15,21 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 
-const auth = getAuth(firebaseApp);
-
 const db = getFirestore();
 
-function signInWithGoogle() { 
-    const GoogleProvider = new GoogleAuthProvider(); 
-    signInWithPopup(auth, GoogleProvider).then((result) => { 
-    const user = result.user; 
-    console.log(user); }) 
-    .catch((error) => { console.error(error); }); 
-}
 
-function signOutWithGoogle() {
-    auth.signOut().then(() => {
-        console.log("Signed out");
-    }).catch((error) => {
-        console.error(error);
-    });
-}
-
-auth.onAuthStateChanged((user) => {
-  if(user) {
-      console.log("User is signed in");
-  } else {
-    console.log("User is signed out");
-  }
-})
-
-window.addEventListener('DOMContentLoaded', (event) => {
-  // Now you can safely use `createDocument` in your HTML
-  document.getElementById("clickme").addEventListener("click", async function() {
-      try {
-        const data = {
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          age: 30,
-      };
-    
-      const docRef = await addDoc(collection(db, "test"), data);
-      console.log("Document created", docRef.id);
+// Update a document
+async function updateDocument(collectionName, docId, data) {
+  try {
+    const washingtonRef = doc(db, collectionName, docId);
+    await updateDoc(washingtonRef, data);
+    console.log("Update completed");
   } catch (error) {
-      console.error("Error creating document", error);
+    console.error("Error updating: ", error);
   }
-  });
-});
+}
+
+
 
 // Create a document
 async function createDocument(collectionName, data) {
@@ -87,16 +56,6 @@ async function readDocuments(collectionName, field, value) {
   }
 }
 
-// Update a document
-async function updateDocument(collectionName, docId, data) {
-  try {
-    const washingtonRef = doc(db, collectionName, docId);
-    await updateDoc(washingtonRef, data);
-    console.log("Update completed");
-  } catch (error) {
-    console.error("Error updating: ", error);
-  }
-}
 
 // Delete a document
 async function deleteDocument(collectionName, docId) {

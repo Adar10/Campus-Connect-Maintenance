@@ -63,19 +63,36 @@
 </script>
   
 <script>
-    function googleSignIn() {
+
+    function signInWithGoogle() {
       var provider = new firebase.auth.GoogleAuthProvider();
       firebase.auth().signInWithPopup(provider).then(function(result) {
         var user = result.user;
-        document.getElementById('login_info').textContent = "You're logged in as " + user.displayName;
+        console.log("Signed in", user)
       }).catch(function(error) {
         console.error(error);
       });
     }
-    document.getElementById('googleSignInButton').addEventListener('click', googleSignIn);
-</script>
 
-<script type="module" src="bundle.js"></script>
+    function signOutWithGoogle() {
+    firebase.auth().signOut().then(() => {
+        console.log("Signed out");
+    }).catch((error) => {
+        console.error(error);
+    });
+    }
+
+    document.getElementById('googleSignInButton').addEventListener('click', signInWithGoogle);
+    document.getElementById('googleSignOutButton').addEventListener('click', signOutWithGoogle);
+
+    firebase.auth().onAuthStateChanged((user) => {
+    if(user) {
+        console.log("User is signed in");
+    } else {
+        console.log("User is signed out");
+    }
+    })
+</script>
 
 </body>
 </html>
