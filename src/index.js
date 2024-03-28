@@ -49,7 +49,7 @@ async function readDocuments(collectionName, field, value) {
     const q = query(collection(db, collectionName), where(field, "==", value));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      // TODO: Use read data
+      console.log(doc.id)
     });
   } catch (error) {
     console.error("Error reading: ", error);
@@ -67,3 +67,26 @@ async function deleteDocument(collectionName, docId) {
   }
 }
 
+document.getElementById("clickme").addEventListener("click", async function() {
+  try{
+  const data = {
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    age: 30,
+  };
+  const new_data = {
+    name: 'Not John Doe',
+    age: 20
+  };
+  var inp = readDocuments("Sannolikhet och Statistik", null , null);
+  console.log(inp);
+  /*
+  const id = createDocument("test", data);
+  console.log("Document added");
+  updateDocument("test", "ONhQVMyn8D5mb5IQdb12", new_data);
+  console.log("Document updated");
+  */
+  } catch (error) {
+    console.error("Error creating document", error);
+  }
+});
