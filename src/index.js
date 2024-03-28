@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-
 const firebaseConfig = {
   apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
   authDomain: "campusconnect-30c4a.firebaseapp.com",
@@ -17,6 +16,11 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 const db = getFirestore();
 
+let isLoggedIn = false;
+
+function setIsLoggedIn(value) {
+  isLoggedIn = value;
+}
 
 // Update a document
 async function updateDocument(collectionName, docId, data) {
@@ -67,26 +71,36 @@ async function deleteDocument(collectionName, docId) {
   }
 }
 
-document.getElementById("clickme").addEventListener("click", async function() {
-  try{
-  const data = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    age: 30,
-  };
-  const new_data = {
-    name: 'Not John Doe',
-    age: 20
-  };
-  var inp = readDocuments("Sannolikhet och Statistik", null , null);
-  console.log(inp);
-  /*
-  const id = createDocument("test", data);
-  console.log("Document added");
-  updateDocument("test", "ONhQVMyn8D5mb5IQdb12", new_data);
-  console.log("Document updated");
-  */
-  } catch (error) {
-    console.error("Error creating document", error);
-  }
+async function getCourses() {
+  const snapshot = await getDocs(collection(db, "kurser"));
+  return snapshot.docs.map(doc => doc.data());
+}
+
+async function generateCourseNavigation() {
+  const courses = await getCourses();
+  console.log(courses);
+  const nav = document.getElementById("navigation");
+  courses.forEach(course => {
+      const link = document.createElement("a");
+      link.href = 'root.html?content=${encodeURIComponent(course.name)}'; // Include content name as a query parameter
+      link.textContent = course.name; // Assuming course has a "name" field
+      link.addEventListener('click', () => {
+        sessionStorage.setItem('contentName', course.name); // Set content name in session storage
+      });
+      nav.appendChild(link);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    try{
+      generateCourseNavigation();
+      console.log("tried");
+    } catch (error) {
+      console.error("Error creating document", error);
+    }
 });
+
+
+
+
+
