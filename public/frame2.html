@@ -3,6 +3,7 @@
 <html>
 <head>
 <title>Tentor</title>
+<script type="module" src="../src/databse.js"></script>
 </head>
 
 
@@ -15,25 +16,76 @@
         width: 40px;
         font-size: 20px;
     }
+    .exambtn {
+        padding: 5px;
+        margin-right: 2px;
+        margin-top: 5px;
+        font-size: 20px;
+    }
+    table {
+        font-size: 20px;
+    }
+    tr {
+        margin: 10px;
+        padding: 5px;
+    }
+    th {
+        padding: 5px;
+    }
+
 </style>
 
 <body>
 
 <button class="btn" onclick="location.href='index.html';"><i class="fa fa-home"></i></button>
 <h1>Campus Connect</h1>
-<p>Old exams</p>
 
-<object class="pdf" 
-    data=""
-    width="50"
-    height="50">
-</object>
+<table border="1">
+    <p style="font-size: large;">Probability and statistics exams</p>
+    <tr>
+        <th>Date</th>
+        <th>Exam</th>
+        <th>Answers</th>
+    </tr>
+    <tr>
+        <th>20/2/2023</th>
+        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
+            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
+            target="_blank">Link</a></button></th>
+        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
+            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
+            target="_blank">Link</a></button></th>
+    </tr>
+    <tr>
+        <th>19/2/2022</th>
+        <th></th>
+        <th></th>
+    </tr>
+</table>
 
-<iframe class="pdf" 
-    src=""
-    width="300" 
-    height="500">
-</iframe>
+<table border="1">
+    <p style="font-size: large;">Algebra exams</p>
+    <tr>
+        <th>Date</th>
+        <th>Exam</th>
+        <th>Answers</th>
+    </tr>
+    <tr>
+        <th>20/2/2023</th>
+        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
+            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
+            target="_blank">Link</a></button></th>
+        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
+            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
+            target="_blank">Link</a></button></th>
+    </tr>
+    <tr>
+        <th>19/2/2022</th>
+        <th></th>
+        <th></th>
+    </tr>
+</table>
+
 
 </body>
 </html>
