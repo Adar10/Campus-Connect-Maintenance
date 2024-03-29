@@ -16,12 +16,6 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 const db = getFirestore();
 
-let isLoggedIn = false;
-
-function setIsLoggedIn(value) {
-  isLoggedIn = value;
-}
-
 // Update a document
 async function updateDocument(collectionName, docId, data) {
   try {
@@ -32,8 +26,6 @@ async function updateDocument(collectionName, docId, data) {
     console.error("Error updating: ", error);
   }
 }
-
-
 
 // Create a document
 async function createDocument(collectionName, data) {

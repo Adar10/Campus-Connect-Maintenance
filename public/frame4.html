@@ -9,6 +9,9 @@
 h1, h2 {
     text-align: center;
 }
+p {
+    font-size: 20px;
+}
 form  {
     display: table;
     margin-left: auto;
@@ -30,14 +33,31 @@ input {
 </style>
 
 <body>
+<script type="module" src="frame2.html"></script>
 
+<script>
+    var myVariable = localStorage.getItem("myVariable");
+    console.log(myVariable); // Output: "Hello from first HTML file!"
+
+    onload=()=> {
+    if (myVariable==="true") {
+        document.getElementById('pdf-file').disabled = false;  
+        document.getElementById('msg').style.display = "none";
+    }
+    else {
+    }
+    }
+    
+    
+    
+</script>
 <button class="btn"  onclick="location.href='root.html';"><i class="fa fa-home"></i></button>
 <h1>Campus Connect</h1>
 <h2>Upload material to our database</h2>
 
 <form>
-    <label for="ffile">File</label>
-    <input type="file" id="ffile" name="ffile"><br><br>
+    <p id="msg" style="display: block;">You must be logged in to upload</p>
+    <input type="file" id="pdf-file" name="ffile" accept="application/pdf, image/jpeg, image/png, video/*" disabled="true"><br>
     <label for="fname">Name of file:</label>
     <input type="text" id="fname" name="fname"><br><br>
     <input type="submit" value="Submit">

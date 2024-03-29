@@ -36,7 +36,8 @@
     
 </style>
 <body>
-<button class="btn"  onclick="location.href='root.html';"><i class="fa fa-home"></i></button>
+    
+<button class="btn" onclick="location.href='index.html';"><i class="fa fa-home"></i></button>
 
 <h1>Campus Connect</h1>
 <p>Log in using a google account.</p>
@@ -45,7 +46,8 @@
     <button id="googleSignInButton">Google login</button>
     <button id="googleSignOutButton">Google sign out</button>
 </nav>
-<p id='login_info' style='display: block'>You're logged in</p>   
+<p id='login_info' style='display: block'>You're logged in</p> 
+<button onclick="location.href='frame4.html'">Upload</button>  
 
 <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-auth.js"></script>
@@ -64,6 +66,40 @@
 </script>
   
 <script>
+    function createoncefunction() {
+        let hasbeencalled = false;
+        return function () {
+            if (!hasbeencalled) {
+                signOutWithGoogle();
+                var myVariable = "false";
+                localStorage.setItem("myVariable", myVariable);
+                hasbeencalled = true;
+            }
+        }
+    }
+
+    const state = createoncefunction();
+
+    function event_login() {
+        change();
+        signInWithGoogle();
+    }
+
+    function event_logout() {
+        change();
+        signOutWithGoogle();
+    }
+
+    function change() {
+        var myVariable = localStorage.getItem("myVariable");
+        if (myVariable === "false") {
+            myVariable = "true";
+        }
+        else {
+            myVariable = "false";
+        }
+        localStorage.setItem("myVariable", myVariable);
+    }
 
     function signInWithGoogle() {
       var provider = new firebase.auth.GoogleAuthProvider();
@@ -83,8 +119,9 @@
     });
     }
 
-    document.getElementById('googleSignInButton').addEventListener('click', signInWithGoogle);
-    document.getElementById('googleSignOutButton').addEventListener('click', signOutWithGoogle);
+    document.getElementById('googleSignInButton').addEventListener('click', event_login);
+
+    document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
     firebase.auth().onAuthStateChanged((user) => {
     if(user) {
