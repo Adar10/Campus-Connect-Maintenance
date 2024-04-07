@@ -3,7 +3,6 @@
 <html>
 <head>
 <title>Tentor</title>
-<script type="module" src="../src/databse.js"></script>
 </head>
 
 
@@ -85,6 +84,28 @@
         <th></th>
     </tr>
 </table>
+
+<script src="bundle.js"></script>
+<button id="addDocumentButton">Add Document to Firestore</button>
+
+    <!-- Include your Firebase SDK and initialize it (already done in your code) -->
+
+    <!-- Your other scripts -->
+
+    <script>
+        // Get a reference to the button
+        const addDocumentButton = document.getElementById('addDocumentButton');
+
+        // Add an event listener to the button
+        addDocumentButton.addEventListener('click', async () => {
+            try {
+                await createDocument('test', { kost: 10 });
+                console.log('New document added to "test" collection.');
+            } catch (error) {
+                console.error('Error adding document:', error);
+            }
+        });
+    </script>
 
 
 </body>
