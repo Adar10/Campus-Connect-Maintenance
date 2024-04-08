@@ -31,7 +31,7 @@ async function generateCourseNavigation() {
       link.href = 'root.html?content=${encodeURIComponent(course.name)}'; // Include content name as a query parameter
       link.textContent = course.name; // Assuming course has a "name" field
       link.addEventListener('click', () => {
-        sessionStorage.setItem('contentName', course.name); // Set content name in session storage
+        localStorage.setItem("course", course.name);
       });
       nav.appendChild(link);
   });
