@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<html>
+<head>
+<title>Campus Connect</title>
+</head>
+
+<style>
+    h1, p {
+        text-align: center;
+    }
+    h1 {
+        color: blue;
+    }
+    .nav {
+        text-align: left;
+        margin-right: 10px;
+        padding: 5px;
+    }
+    .dropbtn {
+    background-color: rgb(74, 74, 255);
+    color: white;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 25%;
+    }
+
+    /* The container <div> - needed to position the dropdown content */
+    .dropdown {
+    position: relative;
+    display: inline-block;
+    }
+
+    /* Dropdown Content (Hidden by Default) */
+    .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    }
+
+    /* Links inside the dropdown */
+    .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    display: block;
+    }
+
+    /* Change color of dropdown links on hover */
+    .dropdown-content a:hover {background-color: #ddd;}
+
+    /* Show the dropdown menu on hover */
+    .dropdown:hover .dropdown-content {display: block;}
+
+    /* Change the background color of the dropdown button when the dropdown content is shown */
+    .dropdown:hover .dropbtn {background-color: #3e438e;}
+
+    .fa{
+        font-size: 25px;
+
+    }
+</style>
+
+<body>
+<div class="dropdown">
+    <button class="dropbtn"><i class="fa fa-bars"></i></button>
+    <div class="dropdown-content">
+        <a href="frame3.html">Login</a>
+        <a href="frame2.html">Exams</a>
+        <a href="frame4.html">Upload</a>
+        <a href="index.html">Courses</a>
+        <a href="#">Quiz</a>
+        <a href="#">Lectures</a>
+    </div>
+</div>
+<h1>Campus Connect</h1>
+
+<p>Welcome to our free study website</p>
+
+
+
+<script type="module" src="bundle.js"></script>
+<script>
+var id = localStorage.getItem("course");
+console.log(id);
+</script>
+</body>
+</html>
