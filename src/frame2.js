@@ -19,7 +19,7 @@ import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, u
  * @function
  * @returns {Object} The Firestore storage instance.
  */
-import { getStorage, ref, exists, getDownloadURL } from 'firebase/storage'
+import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage'
 
 // Firebase configuration object
 const firebaseConfig = {
@@ -103,19 +103,30 @@ async function getFileDownloadURL(course, category, fileName) {
  * @param {string} courseName - The name of the collection.
  */
 async function storageCreateCourse(courseName) {
-  // List of subfolders to be created in the new course folder
-  const subfolderNames = ['Kursmaterial', 'Quiz', 'Tentor', 'Vidoer'];
+  try {
+    const storage = getStorage();
+    const bucket = ref(storage);
 
-  // Creates the root folder if it doesn't exist
-  const bucket = storage.ref();
-  await bucket.child(courseName).putString('');
+    // Create the root folder if it doesn't exist
+    const rootFolderPath = `${courseName}/`;
+    await uploadString(ref(bucket, rootFolderPath), '');
 
-  // Iterates through the list of subfolder names and creates them within the root folder
-  for (const subfolderName of subfolderNames) {
-      const subfolderBlob = bucket.file(`${courseName}/${subfolderName}`);
-      await subfolderBlob.save('');
+    console.log("Root folder created (or already exists):", rootFolderPath);
+
+    // List of subfolders to be created in the new course folder
+    const subfolderNames = ['Kursmaterial', 'Quiz', 'Tentor', 'Vidoer'];
+
+    // Iterate through the list of subfolder names and create them within the root folder
+    for (const subfolderName of subfolderNames) {
+      const subfolderPath = `${rootFolderPath}${subfolderName}/`;
+      await uploadString(ref(bucket, subfolderPath), '');
+      console.log("Subfolder created (or already exists):", subfolderPath);
+    }
+  } catch (error) {
+    console.error("Error creating folders:", error);
   }
 }
+
 
 
 /**
@@ -196,3 +207,6 @@ window.createDocument = createDocument;
 
 // Expose getFileDownloadURL function globally for usage
 window.getFileDownloadURL = getFileDownloadURL;
+
+// Expose storageCreateCourse function globally for usage
+window.storageCreateCourse = storageCreateCourse;
