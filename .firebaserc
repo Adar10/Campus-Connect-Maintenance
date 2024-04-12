@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "campusconnect-30c4a",
-    "Campus": "campusconnect-30c4a"
+    "Campus": "campusconnect-30c4a",
+    "Jacob": "campusconnect-30c4a"
   },
   "targets": {},
   "etags": {}

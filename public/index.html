@@ -41,7 +41,17 @@
     <!-- Course navigation links will be dynamically generated here -->
 </nav>
 
-<script src="bundle.js" defer type="module"></script>
+<script src="bundle.js"></script>
+<script>
+    // Call your function here
+    document.addEventListener("DOMContentLoaded", function() {
+        try {
+            generateCourseNavigation();
+        } catch (error) {
+            console.error("Error creating document", error);
+        }
+    });
+</script>
 
 </body>
 </html>

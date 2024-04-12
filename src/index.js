@@ -16,52 +16,6 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 const db = getFirestore();
 
-// Update a document
-async function updateDocument(collectionName, docId, data) {
-  try {
-    const washingtonRef = doc(db, collectionName, docId);
-    await updateDoc(washingtonRef, data);
-    console.log("Update completed");
-  } catch (error) {
-    console.error("Error updating: ", error);
-  }
-}
-
-// Create a document
-async function createDocument(collectionName, data) {
-  try {
-    const docRef = await addDoc(collection(db, collectionName), data);
-    console.log("Document created", docRef.id);
-    return docRef.id;
-  } catch (error) {
-    console.error("Error creating ", error);
-    return null;
-  }
-}
-
-// Read documents
-async function readDocuments(collectionName, field, value) {
-  try {
-    const q = query(collection(db, collectionName), where(field, "==", value));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id)
-    });
-  } catch (error) {
-    console.error("Error reading: ", error);
-  }
-}
-
-
-// Delete a document
-async function deleteDocument(collectionName, docId) {
-  try {
-    await deleteDoc(doc(db, collectionName, docId));
-    console.log("Deletion completed");
-  } catch (error) {
-    console.error("Error deleting: ", error);
-  }
-}
 
 async function getCourses() {
   const snapshot = await getDocs(collection(db, "kurser"));
@@ -77,20 +31,16 @@ async function generateCourseNavigation() {
       link.href = 'root.html?content=${encodeURIComponent(course.name)}'; // Include content name as a query parameter
       link.textContent = course.name; // Assuming course has a "name" field
       link.addEventListener('click', () => {
-        sessionStorage.setItem('contentName', course.name); // Set content name in session storage
+        localStorage.setItem("course", course.name);
       });
       nav.appendChild(link);
   });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    try{
-      generateCourseNavigation();
-      console.log("tried");
-    } catch (error) {
-      console.error("Error creating document", error);
-    }
-});
+window.generateCourseNavigation = generateCourseNavigation;
+
+
+
 
 
 

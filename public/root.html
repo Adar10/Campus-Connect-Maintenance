@@ -82,16 +82,12 @@
 
 <p>Welcome to our free study website</p>
 
-<script>
-    function getContentName() {
-        return sessionStorage.getItem('contentName');
-    }
 
-    // Use the content name as needed
-    const contentName = getContentName();
-    console.log("Content Name:", contentName);
-</script>
 
 <script type="module" src="bundle.js"></script>
+<script>
+var id = localStorage.getItem("course");
+console.log(id);
+</script>
 </body>
 </html>
