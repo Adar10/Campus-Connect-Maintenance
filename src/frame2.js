@@ -19,7 +19,7 @@ import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, u
  * @function
  * @returns {Object} The Firestore storage instance.
  */
-import { getStorage, ref } from 'firebase/storage'
+import { getStorage, ref, exists, getDownloadURL } from 'firebase/storage'
 
 // Firebase configuration object
 const firebaseConfig = {
@@ -47,22 +47,23 @@ const storage = getStorage();
  * @async
  * @function
  * @param {string} course - The name of the collection.
- * @param {string} tentaName - The name of the tenta.
+ * @param {string} category - The category/subfolder of the file.
+ * @param {string} fileName - The name of the file.
  * @returns {Object|null} - Returns a reference to the file in Firebase Storage if it exists,
  * or null if the file does not exist or an error occurs.
  */
-async function createTentaRef(course, tentaName) {
+async function getFileRef(course, category, fileName) {
   try {
 
     // Create a ref
-    const tentaRef = await ref(`${course}/Tentor/${tentaName}`);
+    const tentaRef = ref(storage, `${course}/${category}/${fileName}`);
 
     // Check if the file exists
-    const exists = await tentaRef.exists();
+    /*const exists = await tentaRef.exists();
     if (!exists[0]) {
       console.log("File does not exist");
       return null;
-    }
+    }*/
 
     console.log("Reference created");
     return tentaRef;
@@ -72,6 +73,50 @@ async function createTentaRef(course, tentaName) {
     return null;
   }
 }
+
+/**
+ * Creates a new reference to the specified file.
+ * @async
+ * @function
+ * @param {string} course - The name of the collection.
+ * @param {string} category - The category/subfolder of the file.
+ * @param {string} fileName - The name of the file.
+ * @returns {Object|null} - A Promise that resolves with the download URL for this object,
+ * or null if the file does not exist or an error occurs.
+ */
+async function getFileDownloadURL(course, category, fileName) {
+  try {
+    const fileRef = ref(storage, `${course}/${category}/${fileName}`);
+    const downloadURL = await getDownloadURL(fileRef);
+    console.log("Download URL:", downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error getting download URL:", error);
+    return null;
+  }
+}
+
+/**
+ * Creates a new folder and subfolders for a course.
+ * @async
+ * @function
+ * @param {string} courseName - The name of the collection.
+ */
+async function storageCreateCourse(courseName) {
+  // List of subfolders to be created in the new course folder
+  const subfolderNames = ['Kursmaterial', 'Quiz', 'Tentor', 'Vidoer'];
+
+  // Creates the root folder if it doesn't exist
+  const bucket = storage.ref();
+  await bucket.child(courseName).putString('');
+
+  // Iterates through the list of subfolder names and creates them within the root folder
+  for (const subfolderName of subfolderNames) {
+      const subfolderBlob = bucket.file(`${courseName}/${subfolderName}`);
+      await subfolderBlob.save('');
+  }
+}
+
 
 /**
  * Adds a new document to the specified collection.
@@ -148,3 +193,6 @@ async function deleteDocument(collectionName, docId) {
 
 // Expose createDocument function globally for usage
 window.createDocument = createDocument;
+
+// Expose getFileDownloadURL function globally for usage
+window.getFileDownloadURL = getFileDownloadURL;
