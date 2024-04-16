@@ -1,4 +1,32 @@
-  /**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: frame2.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: frame2.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>  /**
  * Initializes the Firebase app with the provided configuration.
  * @function
  * @param {Object} firebaseConfig - The Firebase configuration object.
@@ -12,14 +40,6 @@ import { initializeApp } from 'firebase/app';
  * @returns {Object} The Firestore database instance.
  */
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-
-
-/**
- * Gets the Firestore storage instance.
- * @function
- * @returns {Object} The Firestore storage instance.
- */
-import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage'
 
 // Firebase configuration object
 const firebaseConfig = {
@@ -38,93 +58,6 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 // Get Firestore database instance
 const db = getFirestore();
-
-// Get a reference to the storage service
-const storage = getStorage();
-
-/**
- * Creates a new reference to the specified tenta.
- * @async
- * @function
- * @param {string} course - The name of the collection.
- * @param {string} category - The category/subfolder of the file.
- * @param {string} fileName - The name of the file.
- * @returns {Object|null} - Returns a reference to the file in Firebase Storage if it exists,
- * or null if the file does not exist or an error occurs.
- */
-async function getFileRef(course, category, fileName) {
-  try {
-
-    // Create a ref
-    const tentaRef = ref(storage, `${course}/${category}/${fileName}`);
-
-    // Check if the file exists
-    /*const exists = await tentaRef.exists();
-    if (!exists[0]) {
-      console.log("File does not exist");
-      return null;
-    }*/
-
-    console.log("Reference created");
-    return tentaRef;
-
-  } catch (error) {
-    console.error("Error creating reference:", error);
-    return null;
-  }
-}
-
-/**
- * Creates a new reference to the specified file.
- * @async
- * @function
- * @param {string} course - The name of the collection.
- * @param {string} category - The category/subfolder of the file.
- * @param {string} fileName - The name of the file.
- * @returns {Object|null} - A Promise that resolves with the download URL for this object,
- * or null if the file does not exist or an error occurs.
- */
-async function getFileDownloadURL(course, category, fileName) {
-  try {
-    const fileRef = ref(storage, `${course}/${category}/${fileName}`);
-    const downloadURL = await getDownloadURL(fileRef);
-    console.log("Download URL:", downloadURL);
-    return downloadURL;
-  } catch (error) {
-    console.error("Error getting download URL:", error);
-    return null;
-  }
-}
-
-/**
- * Creates a new folder and subfolders for a course.
- * @async
- * @function
- * @param {string} courseName - The name of the collection.
- */
-async function storageCreateCourse(courseName) {
-  try {
-    const storage = getStorage();
-    const bucket = ref(storage);
-
-    // Create the root folder
-    const rootFolderPath = `${courseName}/`;
-
-    // List of subfolders to be created in the new course folder
-    const subfolderNames = ['Kursmaterial', 'Quiz', 'Tentor', 'Videor'];
-
-    // Iterate through the list of subfolder names and create them within the root folder
-    for (const subfolderName of subfolderNames) {
-      const subfolderPath = `${rootFolderPath}${subfolderName}/`;
-      await uploadString(ref(bucket, `${subfolderPath}dummyFile`), '');
-      console.log("Subfolder created (or already exists):", subfolderPath);
-    }
-  } catch (error) {
-    console.error("Error creating folders:", error);
-  }
-}
-
-
 
 /**
  * Adds a new document to the specified collection.
@@ -201,9 +134,26 @@ async function deleteDocument(collectionName, docId) {
 
 // Expose createDocument function globally for usage
 window.createDocument = createDocument;
+</code></pre>
+        </article>
+    </section>
 
-// Expose getFileDownloadURL function globally for usage
-window.getFileDownloadURL = getFileDownloadURL;
 
-// Expose storageCreateCourse function globally for usage
-window.storageCreateCourse = storageCreateCourse;
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createDocument">createDocument</a></li><li><a href="global.html#deleteDocument">deleteDocument</a></li><li><a href="global.html#readDocuments">readDocuments</a></li><li><a href="global.html#updateDocument">updateDocument</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Apr 08 2024 14:19:55 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

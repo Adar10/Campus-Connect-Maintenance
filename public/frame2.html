@@ -73,7 +73,7 @@
     <tr>
         <th>20/2/2023</th>
         <th><button class="exambtn" onclick="redirectToExam('sanstat', 'Tentor', 'test.pdf')">Link</button></th>
-        <th><button class="exambtn" onclick="redirectToExam('sanstat', 'Tentor', 'test.pdf')">Link</button></th>
+        <th><button class="exambtn" onclick="createFoldersTest()">Link</button></th>
     </tr>
     <tr>
         <th>19/2/2022</th>
@@ -99,6 +99,10 @@
             .catch((error) => {
                 console.error("Error:", error);
             });
+    }
+
+    function createFoldersTest() {
+        storageCreateCourse('testCourse');
     }
 </script>
 
