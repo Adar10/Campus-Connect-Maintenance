@@ -17,7 +17,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore();
 
 // Update a document
-async function updateDocument(collectionName, docId, data) {
+export async function updateDocument(collectionName, docId, data) {
     try {
       const washingtonRef = doc(db, collectionName, docId);
       await updateDoc(washingtonRef, data);
@@ -28,7 +28,7 @@ async function updateDocument(collectionName, docId, data) {
   }
   
   // Create a document
-  async function createDocument(collectionName, data) {
+export async function createDocument(collectionName, data) {
     try {
       const docRef = await addDoc(collection(db, collectionName), data);
       console.log("Document created", docRef.id);
@@ -40,7 +40,7 @@ async function updateDocument(collectionName, docId, data) {
   }
   
   // Read documents
-  async function readDocuments(collectionName, field, value) {
+  export async function readDocuments(collectionName, field, value) {
     try {
       const q = query(collection(db, collectionName), where(field, "==", value));
       const querySnapshot = await getDocs(q);
@@ -54,7 +54,7 @@ async function updateDocument(collectionName, docId, data) {
   
   
   // Delete a document
-  async function deleteDocument(collectionName, docId) {
+  export async function deleteDocument(collectionName, docId) {
     try {
       await deleteDoc(doc(db, collectionName, docId));
       console.log("Deletion completed");
@@ -63,4 +63,4 @@ async function updateDocument(collectionName, docId, data) {
     }
   }
   
-  window.createDocument = createDocument;
+//  window.createDocument = createDocument;
