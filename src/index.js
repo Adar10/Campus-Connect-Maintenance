@@ -27,20 +27,54 @@ async function generateCourseNavigation() {
   console.log(courses);
   const nav = document.getElementById("navigation");
   courses.forEach(course => {
-      const link = document.createElement("a");
-      link.href = 'root.html?content=${encodeURIComponent(course.name)}'; // Include content name as a query parameter
-      link.textContent = course.name; // Assuming course has a "name" field
-      link.addEventListener('click', () => {
-        localStorage.setItem("course", course.name);
-      });
-      nav.appendChild(link);
+    const link = document.createElement("a");
+    link.href = 'lectures.html'; // Include content name as a query parameter
+    link.textContent = course.name; // Assuming course has a "name" field
+    link.addEventListener('click', () => {
+      localStorage.setItem("course", course.name);
+      localStorage.setItem("ID", course.ID);
+    });
+    link.style.textDecoration = "none";
+    link.style.color = "black";
+
+    const h5 = document.createElement("h5");
+
+    const button = document.createElement("button");
+    button.classList.add("btn", "btn-primary", "btn-lg");
+    button.style.marginRight = "2rem";
+    button.style.marginTop = "2rem";
+    button.addEventListener('click', () => {
+      window.location.href = 'lectures.html';
+      localStorage.setItem("course", course.name);
+    });    // button.style.width = "20rem";
+
+    //const div_container = document.createElement("div");
+    //div_container.classList.add("card", "container", "mt-5");
+    // div_container.style.width = "20rem";
+
+    // const div_body = document.createElement("div");
+    // div_body.classList.add("card-body");
+
+
+
+    h5.appendChild(link);
+    button.appendChild(h5);
+    nav.appendChild(button);
+
+    // div_body.appendChild(h5);
+    // div_container.appendChild(div_body);
+    //nav.appendChild(div_container);
+    nav.style.width = "100%";
+
+
   });
 }
 
+
+
+
+
 window.generateCourseNavigation = generateCourseNavigation;
-
-
-
 
 
 
