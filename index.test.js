@@ -23,6 +23,10 @@ const testCollectionName = "testCollection";
 const testDocumentId = "testDocumentId";
 const testDocumentData = { name: "Test Document" };
 const testUpdateData = { name: "Updated Test Document" };
+const testCollectionName2 = "testCollection2";
+const testDocumentId2 = "testDocumentId2";
+const testDocumentData2 = { name: "Test Document2" };
+const testUpdateData2 = { name: "Updated Test Document2" };
 
 describe("Database Tests", () => {
   test("Create Document", async () => {
@@ -32,6 +36,13 @@ describe("Database Tests", () => {
 
     expect(docId).toEqual(testDocumentId);
     expect(addDoc).toHaveBeenCalledWith(collection(db, testCollectionName), testDocumentData);
+
+    addDoc.mockImplementation(() => Promise.resolve({ id: testDocumentId2 }));
+
+    const docId2 = await createDocument(testCollectionName2, testDocumentData2);
+
+    expect(docId2).toEqual(testDocumentId2);
+    expect(addDoc).toHaveBeenCalledWith(collection(db, testCollectionName2), testDocumentData2);
   });
 
   test("Update Document", async () => {
@@ -40,6 +51,12 @@ describe("Database Tests", () => {
     await updateDocument(testCollectionName, testDocumentId, testUpdateData);
 
     expect(updateDoc).toHaveBeenCalledWith(doc(db, testCollectionName, testDocumentId), testUpdateData);
+
+    updateDoc.mockImplementation(() => Promise.resolve());
+
+    await updateDocument(testCollectionName2, testDocumentId2, testUpdateData2);
+
+    expect(updateDoc).toHaveBeenCalledWith(doc(db, testCollectionName2, testDocumentId2), testUpdateData2);
   });
 
   test("Read Documents", async () => {
@@ -50,6 +67,14 @@ describe("Database Tests", () => {
     await readDocuments(testCollectionName, "field", "value");
 
     expect(getDocs).toHaveBeenCalledWith(query(collection(db, testCollectionName), where("field", "==", "value")));
+    
+    getDocs.mockImplementation(() => Promise.resolve({
+      forEach: (callback) => callback({ id: testDocumentId2, data: () => testDocumentData2 }),
+    }));
+
+    await readDocuments(testCollectionName2, "field", "value");
+
+    expect(getDocs).toHaveBeenCalledWith(query(collection(db, testCollectionName2), where("field", "==", "value")));
   });
 
   test("Delete Document", async () => {
@@ -58,5 +83,12 @@ describe("Database Tests", () => {
     await deleteDocument(testCollectionName, testDocumentId);
 
     expect(deleteDoc).toHaveBeenCalledWith(doc(db, testCollectionName, testDocumentId));
+
+
+    deleteDoc.mockImplementation(() => Promise.resolve());
+
+    await deleteDocument(testCollectionName2, testDocumentId2);
+
+    expect(deleteDoc).toHaveBeenCalledWith(doc(db, testCollectionName2, testDocumentId2));
   });
 });
