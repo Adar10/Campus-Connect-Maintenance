@@ -49,6 +49,7 @@ async function generateCourseNavigation() {
     link.addEventListener('click', () => {
       localStorage.setItem("course", course.name);
       localStorage.setItem("ID", course.ID);
+      console.log(courseID);
     });
     link.style.textDecoration = "none";
     link.style.color = "black";
@@ -88,7 +89,7 @@ async function generateCourseExams() {
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(db, "1MS005", "Tentor");
+  const docRef = doc(db, courseID, "Tentor");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("exams");
