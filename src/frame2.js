@@ -5,6 +5,7 @@
  * @returns {Object} The initialized Firebase app.
  */
 import { initializeApp } from 'firebase/app';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 /**
  * Gets the Firestore database instance.
@@ -46,24 +47,16 @@ const storage = getStorage();
  * Creates a new reference to the specified tenta.
  * @async
  * @function
- * @param {string} course - The name of the collection.
+ * @param {string} courseID - The ID of given course.
  * @param {string} category - The category/subfolder of the file.
  * @param {string} fileName - The name of the file.
  * @returns {Object|null} - Returns a reference to the file in Firebase Storage if it exists,
  * or null if the file does not exist or an error occurs.
  */
-async function getFileRef(course, category, fileName) {
+async function getFileRef(courseID, category, fileName) {
   try {
 
-    // Create a ref
-    const tentaRef = ref(storage, `${course}/${category}/${fileName}`);
-
-    // Check if the file exists
-    /*const exists = await tentaRef.exists();
-    if (!exists[0]) {
-      console.log("File does not exist");
-      return null;
-    }*/
+    const tentaRef = ref(storage, `${courseID}/${category}/${fileName}`);
 
     console.log("Reference created");
     return tentaRef;
@@ -75,18 +68,16 @@ async function getFileRef(course, category, fileName) {
 }
 
 /**
- * Creates a new reference to the specified file.
+ * Creates a new downloadURL to the specified file.
  * @async
  * @function
- * @param {string} course - The name of the collection.
- * @param {string} category - The category/subfolder of the file.
- * @param {string} fileName - The name of the file.
+ * @param {string} path - The path of the file in our storage.
  * @returns {Object|null} - A Promise that resolves with the download URL for this object,
  * or null if the file does not exist or an error occurs.
  */
-async function getFileDownloadURL(course, category, fileName) {
+async function getFileDownloadURL(path) {
   try {
-    const fileRef = ref(storage, `${course}/${category}/${fileName}`);
+    const fileRef = ref(storage, path);
     const downloadURL = await getDownloadURL(fileRef);
     console.log("Download URL:", downloadURL);
     return downloadURL;
@@ -97,18 +88,62 @@ async function getFileDownloadURL(course, category, fileName) {
 }
 
 /**
+ * Uploads a file and creates a firestore reference.
+ * @async
+ * @function
+ * @param {string} collectionID - The collection ID.
+ * @param {string} category - The type of file.
+ * @param {string} fileName - File name, included ."type" (Example: .PDF).
+ * @param {string} desc - The file description.
+ * @param {File} file - The file object selected by the user.
+ */
+async function uploadFile(collectionID, category, fileName, desc, file) {
+  try {
+    const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
+    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc);
+    await uploadBytes(storageRef, file).then((snapshot) => {
+      console.log("Uploaded file succesfully");
+    });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+  }
+}
+
+/**
+ * Adds an array field with information inside a given document in a given collection.
+ * @async
+ * @function
+ * @param {string} collectionID - The collection ID.
+ * @param {string} documentName - The document name.
+ * @param {string} fieldValue1 - Array index 0 value.
+ * @param {string} fieldValue2 - Array index 1 value.
+ * @param {string} fieldValue3 - Array index 2 value.
+ */
+async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3) {
+  try {
+    const docRef = doc(db, collectionID, documentName);
+    await setDoc(docRef, {
+      [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3]
+    }, { merge: true });
+    console.log("Array field added/updated successfully");
+  } catch (error) {
+    console.error("Error adding array field:", error);
+  }
+}
+
+/**
  * Creates a new folder and subfolders for a course.
  * @async
  * @function
- * @param {string} courseName - The name of the collection.
+ * @param {string} collectionID - The ID of the collection.
  */
-async function storageCreateCourse(courseName) {
+async function storageCreateCourse(collectionID) {
   try {
     const storage = getStorage();
     const bucket = ref(storage);
 
     // Create the root folder
-    const rootFolderPath = `${courseName}/`;
+    const rootFolderPath = `${collectionID}/`;
 
     // List of subfolders to be created in the new course folder
     const subfolderNames = ['Kursmaterial', 'Quiz', 'Tentor', 'Videor'];
@@ -207,3 +242,5 @@ window.getFileDownloadURL = getFileDownloadURL;
 
 // Expose storageCreateCourse function globally for usage
 window.storageCreateCourse = storageCreateCourse;
+
+window.uploadFile = uploadFile;
