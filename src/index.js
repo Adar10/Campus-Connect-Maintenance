@@ -117,12 +117,11 @@ async function generateCourseExams() {
         name.textContent = arrayField[0];
 
         const button = document.createElement("button");
-        const link = getFileDownloadURL(arrayField[1]);
         console.log(link);
         button.textContent = "Click to open";
         button.classList.add("btn", "btn-primary", "btn-lg");
         button.addEventListener('click', () => {
-          window.open(link);
+          window.open(getFileDownloadURL(arrayField[1]));
         });
 
         card_body.appendChild(name);
