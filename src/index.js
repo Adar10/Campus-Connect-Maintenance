@@ -117,7 +117,6 @@ async function generateCourseExams() {
         name.textContent = arrayField[0];
 
         const button = document.createElement("button");
-        console.log(link);
         button.textContent = "Click to open";
         button.classList.add("btn", "btn-primary", "btn-lg");
         button.addEventListener('click', () => {
