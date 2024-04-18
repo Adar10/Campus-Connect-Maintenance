@@ -1,6 +1,28 @@
+  /**
+ * Initializes the Firebase app with the provided configuration.
+ * @function
+ * @param {Object} firebaseConfig - The Firebase configuration object.
+ * @returns {Object} The initialized Firebase app.
+ */
 import { initializeApp } from 'firebase/app';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+
+/**
+ * Gets the Firestore database instance.
+ * @function
+ * @returns {Object} The Firestore database instance.
+ */
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
+
+/**
+ * Gets the Firestore storage instance.
+ * @function
+ * @returns {Object} The Firestore storage instance.
+ */
+import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage'
+
+// Firebase configuration object
 const firebaseConfig = {
   apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
   authDomain: "campusconnect-30c4a.firebaseapp.com",
@@ -12,23 +34,142 @@ const firebaseConfig = {
   measurementId: "G-YRMP4KDMNX"
 };
 
+// Initialize Firebase app
 const firebaseApp = initializeApp(firebaseConfig);
 
+// Get Firestore database instance
 const db = getFirestore();
 
-// Update a document
-async function updateDocument(collectionName, docId, data) {
-    try {
-      const washingtonRef = doc(db, collectionName, docId);
-      await updateDoc(washingtonRef, data);
-      console.log("Update completed");
-    } catch (error) {
-      console.error("Error updating: ", error);
-    }
+// Get a reference to the storage service
+const storage = getStorage();
+
+/**
+ * Creates a new reference to the specified tenta.
+ * @async
+ * @function
+ * @param {string} courseID - The ID of given course.
+ * @param {string} category - The category/subfolder of the file.
+ * @param {string} fileName - The name of the file.
+ * @returns {Object|null} - Returns a reference to the file in Firebase Storage if it exists,
+ * or null if the file does not exist or an error occurs.
+ */
+async function getFileRef(courseID, category, fileName) {
+  try {
+
+    const tentaRef = ref(storage, `${courseID}/${category}/${fileName}`);
+
+    console.log("Reference created");
+    return tentaRef;
+
+  } catch (error) {
+    console.error("Error creating reference:", error);
+    return null;
   }
-  
-  // Create a document
-  async function createDocument(collectionName, data) {
+}
+
+/**
+ * Creates a new downloadURL to the specified file.
+ * @async
+ * @function
+ * @param {string} path - The path of the file in our storage.
+ * @returns {Object|null} - A Promise that resolves with the download URL for this object,
+ * or null if the file does not exist or an error occurs.
+ */
+async function getFileDownloadURL(path) {
+  try {
+    const fileRef = ref(storage, path);
+    const downloadURL = await getDownloadURL(fileRef);
+    console.log("Download URL:", downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error getting download URL:", error);
+    return null;
+  }
+}
+
+/**
+ * Uploads a file and creates a firestore reference.
+ * @async
+ * @function
+ * @param {string} collectionID - The collection ID.
+ * @param {string} category - The type of file.
+ * @param {string} fileName - File name, included ."type" (Example: .PDF).
+ * @param {string} desc - The file description.
+ * @param {File} file - The file object selected by the user.
+ */
+async function uploadFile(collectionID, category, fileName, desc, file) {
+  try {
+    const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
+    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc);
+    await uploadBytes(storageRef, file).then((snapshot) => {
+      console.log("Uploaded file succesfully");
+    });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+  }
+}
+
+/**
+ * Adds an array field with information inside a given document in a given collection.
+ * @async
+ * @function
+ * @param {string} collectionID - The collection ID.
+ * @param {string} documentName - The document name.
+ * @param {string} fieldValue1 - Array index 0 value.
+ * @param {string} fieldValue2 - Array index 1 value.
+ * @param {string} fieldValue3 - Array index 2 value.
+ */
+async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3) {
+  try {
+    const docRef = doc(db, collectionID, documentName);
+    await setDoc(docRef, {
+      [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3]
+    }, { merge: true });
+    console.log("Array field added/updated successfully");
+  } catch (error) {
+    console.error("Error adding array field:", error);
+  }
+}
+
+/**
+ * Creates a new folder and subfolders for a course.
+ * @async
+ * @function
+ * @param {string} collectionID - The ID of the collection.
+ */
+async function storageCreateCourse(collectionID) {
+  try {
+    const storage = getStorage();
+    const bucket = ref(storage);
+
+    // Create the root folder
+    const rootFolderPath = `${collectionID}/`;
+
+    // List of subfolders to be created in the new course folder
+    const subfolderNames = ['Kursmaterial', 'Quiz', 'Tentor', 'Videor'];
+
+    // Iterate through the list of subfolder names and create them within the root folder
+    for (const subfolderName of subfolderNames) {
+      const subfolderPath = `${rootFolderPath}${subfolderName}/`;
+      await uploadString(ref(bucket, `${subfolderPath}dummyFile`), '');
+      console.log("Subfolder created (or already exists):", subfolderPath);
+    }
+  } catch (error) {
+    console.error("Error creating folders:", error);
+  }
+}
+
+
+
+/**
+ * Adds a new document to the specified collection.
+ * @async
+ * @function
+ * @param {string} collectionName - The name of the collection.
+ * @param {Object} data - The data to be added to the document.
+ * @returns {string|null} The ID of the newly created document, or null if an error occurred.
+ */
+async function createDocument(collectionName, data) {
     try {
       const docRef = await addDoc(collection(db, collectionName), data);
       console.log("Document created", docRef.id);
@@ -37,30 +178,69 @@ async function updateDocument(collectionName, docId, data) {
       console.error("Error creating ", error);
       return null;
     }
-  }
-  
-  // Read documents
-  async function readDocuments(collectionName, field, value) {
+}
+
+/**
+ * Updates an existing document in the specified collection.
+ * @async
+ * @function
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} docId - The ID of the document to be updated.
+ * @param {Object} data - The updated data for the document.
+ */
+async function updateDocument(collectionName, docId, data) {
+    try {
+      const washingtonRef = doc(db, collectionName, docId);
+      await updateDoc(washingtonRef, data);
+      console.log("Update completed");
+    } catch (error) {
+      console.error("Error updating: ", error);
+    }
+}
+
+/**
+ * Reads documents from the specified collection based on a specific field and value.
+ * @async
+ * @function
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} field - The field to filter documents by.
+ * @param {any} value - The value to filter documents by.
+ */
+async function readDocuments(collectionName, field, value) {
     try {
       const q = query(collection(db, collectionName), where(field, "==", value));
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
-        console.log(doc.id)
+        console.log(doc.id);
       });
     } catch (error) {
       console.error("Error reading: ", error);
     }
-  }
-  
-  
-  // Delete a document
-  async function deleteDocument(collectionName, docId) {
+}
+
+/**
+ * Deletes a document from the specified collection.
+ * @async
+ * @function
+ * @param {string} collectionName - The name of the collection.
+ * @param {string} docId - The ID of the document to be deleted.
+ */
+async function deleteDocument(collectionName, docId) {
     try {
       await deleteDoc(doc(db, collectionName, docId));
       console.log("Deletion completed");
     } catch (error) {
       console.error("Error deleting: ", error);
     }
-  }
-  
-  window.createDocument = createDocument;
+}
+
+// Expose createDocument function globally for usage
+window.createDocument = createDocument;
+
+// Expose getFileDownloadURL function globally for usage
+window.getFileDownloadURL = getFileDownloadURL;
+
+// Expose storageCreateCourse function globally for usage
+window.storageCreateCourse = storageCreateCourse;
+
+window.uploadFile = uploadFile;
