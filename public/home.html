@@ -37,7 +37,6 @@
 
 
     #filter {
-        background-image: url('/css/searchicon.png');
         /* Add a search icon to input */
         background-position: 10px 12px;
         /* Position the search icon */
@@ -141,7 +140,17 @@
             } catch (error) {
                 console.error("Error creating document", error);
             }
+
         });
+        document.addEventListener("DOMContentLoaded", function () {
+            try {
+                generateCourseExams();
+            } catch (error) {
+                console.error("Error retrieving exams", error);
+            }
+
+        });
+
     </script>
 
 
@@ -262,9 +271,9 @@
             });
         }
 
-        document.getElementById('googleSignInButton').addEventListener('click', event_login);
+        //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
-        document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
+        //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
