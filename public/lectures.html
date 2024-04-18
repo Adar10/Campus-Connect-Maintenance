@@ -162,6 +162,35 @@
         </div>
     </div>
 
+
+    <div class="container mt-5" style="margin-bottom: 5rem;">
+        <div class="row" id="lectures">
+
+        </div>
+    </div>
+
+
+    <script>
+        // Call your function here
+        document.addEventListener("DOMContentLoaded", function () {
+            try {
+                generateCourseNavigation();
+            } catch (error) {
+                console.error("Error creating document", error);
+            }
+
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            try {
+                generateCourseLectures();
+            } catch (error) {
+                console.error("Error retrieving lectures", error);
+            }
+
+        });
+    </script>
+
+
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
@@ -257,9 +286,9 @@
             });
         }
 
-        document.getElementById('googleSignInButton').addEventListener('click', event_login);
+        //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
-        document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
+        //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
@@ -268,7 +297,12 @@
                 console.log("User is signed out");
             }
         })
+
+
     </script>
+
+
+
 
 
 

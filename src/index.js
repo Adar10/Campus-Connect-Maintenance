@@ -143,9 +143,71 @@ async function generateCourseExams() {
 
 }
 
+async function generateCourseLectures() {
+
+  var courseID = localStorage.getItem("ID");
+  console.log(courseID);
+
+  const docRef = doc(db, courseID, "Lectures");
+  const docSnap = await getDoc(docRef);
+  console.log(docSnap);
+  const row = document.getElementById("lectures");
 
 
+  if (docSnap) {
+    const data = docSnap.data();
+    if (data) {
+      // Iterate over each field in the document's data
+      for (const fieldName in data) {
 
+        const arrayField = data[fieldName];
+        console.log(arrayField[0]);
+
+        const card_container = document.createElement("div");
+        card_container.classList.add("card", "container", "mt-5");
+        card_container.style.width = "20rem";
+
+
+        const card_body = document.createElement("div");
+        card_body.classList.add("card-body");
+
+
+        const name = document.createElement("h5");
+        name.textContent = arrayField[0];
+
+        const desc = document.createElement("p");
+        desc.textContent = arrayField[2];
+
+        const button = document.createElement("button");
+        button.textContent = "Click to open";
+        button.classList.add("btn", "btn-primary", "btn-lg");
+        button.addEventListener('click', async () => {
+          try {
+            const URL = await getFileDownloadURL(arrayField[1]);
+            window.open(URL);
+          } catch (error) {
+            console.error("Error getting download URL:", error);
+          }
+        });
+
+        card_body.appendChild(name);
+        card_body.appendChild(desc);
+        card_body.appendChild(button);
+        card_container.appendChild(card_body);
+        row.appendChild(card_container);
+
+
+      }
+    }
+  } else {
+    console.log("No such document!");
+  }
+
+
+}
+
+
+window.generateCourseLectures = generateCourseLectures;
 window.generateCourseExams = generateCourseExams;
 window.generateCourseNavigation = generateCourseNavigation;
 
