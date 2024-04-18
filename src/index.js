@@ -119,8 +119,13 @@ async function generateCourseExams() {
         const button = document.createElement("button");
         button.textContent = "Click to open";
         button.classList.add("btn", "btn-primary", "btn-lg");
-        button.addEventListener('click', () => {
-          window.open(getFileDownloadURL(arrayField[1]));
+        button.addEventListener('click', async () => {
+          try {
+            const URL = await getFileDownloadURL(arrayField[1]);
+            window.open(URL);
+          } catch (error) {
+            console.error("Error getting download URL:", error);
+          }
         });
 
         card_body.appendChild(name);
