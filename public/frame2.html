@@ -2,10 +2,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <html>
 <head>
-<title>Tentor</title>
-</head>
-
-
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentor</title>
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval';">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Inline Styles -->
 <style>
     h1 {
         text-align: center;
@@ -48,12 +53,8 @@
     </tr>
     <tr>
         <th>20/2/2023</th>
-        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
-            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
-            target="_blank">Link</a></button></th>
-        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
-            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
-            target="_blank">Link</a></button></th>
+        <th><button class="exambtn" onclick="redirectToExam('sanstat', 'Tentor', 'test.pdf')">Link</button></th>
+        <th><button class="exambtn" onclick="redirectToExam('sanstat', 'Tentor', 'test.pdf')">Link</button></th>
     </tr>
     <tr>
         <th>19/2/2022</th>
@@ -71,12 +72,8 @@
     </tr>
     <tr>
         <th>20/2/2023</th>
-        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
-            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
-            target="_blank">Link</a></button></th>
-        <th><button class="exambtn"><a style="color: black; text-decoration: none;" 
-            href="https://drive.google.com/file/d/19eydhIR8AT31USTV-p5pHbVnCtgW6k56/view?usp=drive_link.pdf" 
-            target="_blank">Link</a></button></th>
+        <th><button class="exambtn" onclick="redirectToExam('sanstat', 'Tentor', 'test.pdf')">Link</button></th>
+        <th><button class="exambtn" onclick="createFoldersTest()">Link</button></th>
     </tr>
     <tr>
         <th>19/2/2022</th>
@@ -86,27 +83,28 @@
 </table>
 
 <script src="bundle.js"></script>
-<button id="addDocumentButton">Add Document to Firestore</button>
 
-    <!-- Include your Firebase SDK and initialize it (already done in your code) -->
+<script>
+    function redirectToExam(course, category, fileName) {
+        // Call the createFileRef function to get the reference
+        getFileDownloadURL(course, category, fileName)
+            .then((downloadURL) => {
+                // If the reference exists, open it in a new tab
+                if (downloadURL) {
+                    window.open(downloadURL);
+                } else {
+                    console.log("File does not exist");
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
 
-    <!-- Your other scripts -->
-
-    <script>
-        // Get a reference to the button
-        const addDocumentButton = document.getElementById('addDocumentButton');
-
-        // Add an event listener to the button
-        addDocumentButton.addEventListener('click', async () => {
-            try {
-                await createDocument('test', { kost: 10 });
-                console.log('New document added to "test" collection.');
-            } catch (error) {
-                console.error('Error adding document:', error);
-            }
-        });
-    </script>
-
+    function createFoldersTest() {
+        storageCreateCourse('testCourse');
+    }
+</script>
 
 </body>
 </html>
