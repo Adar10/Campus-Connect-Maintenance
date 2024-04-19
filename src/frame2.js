@@ -40,21 +40,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 // Get Firestore database instance
 const db = getFirestore();
 
-// Update a document
-export async function updateDocument(collectionName, docId, data) {
-    try {
-      const washingtonRef = doc(db, collectionName, docId);
-      await updateDoc(washingtonRef, data);
-      console.log("Update completed");
-    } catch (error) {
-      console.error("Error updating: ", error);
-    }
-  }
-  
-  // Create a document
-export async function createDocument(collectionName, data) {
-// Get a reference to the storage service
-const storage = getStorage();
+export {createDocument, readDocuments, updateDocument, deleteDocument}
 
 /**
  * Creates a new reference to the specified tenta.
@@ -192,11 +178,6 @@ async function createDocument(collectionName, data) {
       return null;
     }
   }
-}
-  
-  // Read documents
-export async function readDocuments(collectionName, field, value) {
-}
 
 /**
  * Updates an existing document in the specified collection.
@@ -235,11 +216,6 @@ async function readDocuments(collectionName, field, value) {
       console.error("Error reading: ", error);
     }
   }
-  
-  
-  // Delete a document
-  export async function deleteDocument(collectionName, docId) {
-}
 
 /**
  * Deletes a document from the specified collection.
@@ -260,12 +236,12 @@ async function deleteDocument(collectionName, docId) {
 //  window.createDocument = createDocument;
 
 // Expose createDocument function globally for usage
-window.createDocument = createDocument;
+//window.createDocument = createDocument;
 
 // Expose getFileDownloadURL function globally for usage
-window.getFileDownloadURL = getFileDownloadURL;
+//window.getFileDownloadURL = getFileDownloadURL;
 
 // Expose storageCreateCourse function globally for usage
-window.storageCreateCourse = storageCreateCourse;
+//window.storageCreateCourse = storageCreateCourse;
 
-window.uploadFile = uploadFile;
+//window.uploadFile = uploadFile;
