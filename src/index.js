@@ -206,7 +206,56 @@ async function generateCourseLectures() {
 
 }
 
+async function generateCourseVideos() {
 
+  var courseID = localStorage.getItem("ID");
+  console.log(courseID);
+
+  const docRef = doc(db, courseID, "Videos");
+  const docSnap = await getDoc(docRef);
+  console.log(docSnap);
+  const row = document.getElementById("videos");
+
+
+  if (docSnap) {
+    const data = docSnap.data();
+    if (data) {
+      // Iterate over each field in the document's data
+      for (const fieldName in data) {
+
+        const arrayField = data[fieldName];
+        console.log(arrayField[0]);
+
+        const iframe = document.createElement("iframe");
+        iframe.width = "400px"
+        iframe.height = "315px"
+        iframe.src = arrayField[0];
+        iframe.title = "hejsan";
+        iframe.frameborder = "0"
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+        iframe.referrerPolicy = "strict-origin-when-cross-origin";
+        iframe.setAttribute('allowFullScreen', '');
+        iframe.style.margin = "3rem";
+        // iframe.classList.add("embed-responsive-item");
+
+
+
+
+        row.appendChild(iframe);
+        // title = "YouTube video player" frameborder = "0" allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy = "strict-origin-when-cross-origin" allowfullscreen ></iframe >
+        // frameborder="0" ayroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+      }
+    }
+  } else {
+    console.log("No such document!");
+  }
+
+
+}
+
+
+window.generateCourseVideos = generateCourseVideos;
 window.generateCourseLectures = generateCourseLectures;
 window.generateCourseExams = generateCourseExams;
 window.generateCourseNavigation = generateCourseNavigation;
