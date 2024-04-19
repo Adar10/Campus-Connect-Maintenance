@@ -25,5 +25,4 @@ jobs:
 
     - name: Testing
       run: |
-        npm install
-        npx webpack
+        npm test
