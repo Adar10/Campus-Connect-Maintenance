@@ -89,7 +89,7 @@ async function generateCourseExams() {
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(db, courseID, "Tentor");
+  const docRef = doc(db, courseID, "Exams");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("exams");
@@ -250,11 +250,186 @@ async function generateCourseVideos() {
   } else {
     console.log("No such document!");
   }
+}
+
+async function generateUpload() {
+  const courses = await getCourses();
+  const div_start = document.getElementById("upload");
+
+  courses.forEach(course => {
+    console.log(course.name + " has ID: " + course.ID);
+
+    const card_container = document.createElement("div");
+    card_container.classList.add("card", "container", "mt-5")
+    card_container.style.width = "20rem";
+
+    const card_body = document.createElement("div");
+    card_body.classList.add("card-body");
+
+    const name = document.createElement("h5");
+    name.textContent = course.name;
+
+    const file = document.createElement("input");
+    file.classList.add("form-control");
+    file.id = "formFileLg";
+    file.type = "file";
+
+    const fileName = document.createElement("input");
+    fileName.classList.add("form-control");
+    fileName.id = "fileName";
+    fileName.type = "text";
+    fileName.placeholder = "Name of file";
 
 
+    const fileDesc = document.createElement("input");
+    fileDesc.classList.add("form-control");
+    fileDesc.id = "fileDesc";
+    fileDesc.type = "text"
+    fileDesc.placeholder = "Description of file";
+
+    const div_input = document.createElement("div");
+    div_input.classList.add("input-group");
+
+    const select = document.createElement("select");
+    select.classList.add("custom-select");
+    select.id = "inputGroupSelect04";
+    select.style.flex = "1";
+
+    const opt_type = document.createElement("option");
+    opt_type.setAttribute('selected', '');
+    opt_type.textContent = "Choose data type"
+
+    const opt_1 = document.createElement("option");
+    opt_1.value = "1";
+    opt_1.textContent = "Lectures";
+
+    const opt_2 = document.createElement("option");
+    opt_2.value = "2";
+    opt_2.textContent = "Videos";
+
+    const opt_3 = document.createElement("option");
+    opt_3.value = "3";
+    opt_3.textContent = "Quizzes";
+
+    const opt_4 = document.createElement("option");
+    opt_4.value = "4";
+    opt_4.textContent = "Exams";
+
+    const div_append = document.createElement("div");
+    div_append.classList.add("input-group-append");
+
+    const btn = document.createElement("button");
+    btn.classList.add("btn", "btn-primary");
+    btn.type = "button";
+    btn.textContent = "Submit";
+    btn.addEventListener('click', async () => {
+      try {
+        submitFile(course.ID);
+      } catch (error) {
+        console.error("Error getting download URL:", error);
+      }
+    });
+
+
+
+    div_start.appendChild(card_container);
+    card_container.appendChild(card_body);
+    card_body.appendChild(name);
+    card_body.appendChild(file);
+    card_body.appendChild(fileName);
+    card_body.appendChild(fileDesc);
+    card_body.appendChild(div_input);
+    div_input.appendChild(select);
+    select.appendChild(opt_type);
+    select.appendChild(opt_1);
+    select.appendChild(opt_2);
+    select.appendChild(opt_3);
+    select.appendChild(opt_4);
+    div_input.appendChild(btn);
+
+  });
+}
+
+/**
+* Uploads a file and creates a firestore reference.
+* @async
+* @function
+* @param {string} collectionID - The collection ID.
+* @param {string} category - The type of file.
+* @param {string} fileName - File name, included ."type" (Example: .PDF).
+* @param {string} desc - The file description.
+* @param {File} file - The file object selected by the user.
+*/
+async function uploadFile(collectionID, category, fileName, desc, file) {
+  try {
+    const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
+    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc);
+    await uploadBytes(storageRef, file).then((snapshot) => {
+      console.log("Uploaded file succesfully");
+    });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+  }
+}
+
+/**
+ * Adds an array field with information inside a given document in a given collection.
+ * @async
+ * @function
+ * @param {string} collectionID - The collection ID.
+ * @param {string} documentName - The document name.
+ * @param {string} fieldValue1 - Array index 0 value.
+ * @param {string} fieldValue2 - Array index 1 value.
+ * @param {string} fieldValue3 - Array index 2 value.
+ */
+async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3) {
+  try {
+    const docRef = doc(db, collectionID, documentName);
+    await setDoc(docRef, {
+      [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3]
+    }, { merge: true });
+    console.log("Array field added/updated successfully");
+  } catch (error) {
+    console.error("Error adding array field:", error);
+  }
 }
 
 
+
+/**
+ * Adds a file to the database
+ * @async
+ * @function
+ * @param {string} courseID - The course ID 
+ */
+async function submitFile(courseID) {
+  // Get the file input element
+  var fileInput = document.getElementById('formFileLg');
+  var nameInput = document.getElementById('fileName').value;
+  var desc = document.getElementById('fileDesc').value;
+
+  // Get the selected file
+  var file = fileInput.files[0];
+
+  // Get the selected value from the dropdown
+  var selectElement = document.getElementById('inputGroupSelect04');
+  var selectedValue = selectElement.value;
+
+  console.log(file.name);
+  if (selectedValue == 1) {
+    uploadFile(courseID, "Exams", file.name, desc, file);
+  } else if (selectedValue == 2) {
+    uploadFile(courseID, "Lectures", file.name, desc, file);
+  } else if (selectedValue == 3) {
+    uploadFile(courseID, "Exams", file.name, desc, file);
+  } else if (selectedValue == 4) {
+    uploadFile(courseID, "Exams", file.name, desc, file);
+  }
+}
+
+
+window.submitFile = submitFile;
+window.generateUpload = generateUpload;
 window.generateCourseVideos = generateCourseVideos;
 window.generateCourseLectures = generateCourseLectures;
 window.generateCourseExams = generateCourseExams;

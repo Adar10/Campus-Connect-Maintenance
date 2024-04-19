@@ -154,101 +154,68 @@
   <script>
     $("#filter").on("keyup", function () {
       var value = $(this).val().toLowerCase();
-      $("#mycard > div").filter(function () {
+      $("#mycard > div > div").filter(function () {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
       });
     });
   </script>
 
 
-
+  <!-- 
   <div class="container mt-5" style="margin-bottom: 5rem;">
     <div class="row" id="mycard">
-      <div class="card container mt-5" style="width: 20rem;">
-        <div class="card-body">
-          <h5 class="card-title">Envariabelanalys</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-            content.</p>
-          <input class="form-control" id="formFileLg" type="file">
-          <div class="input-group">
-            <select class="custom-select" id="inputGroupSelect04" style="flex: 1;">
-              <option selected>Choose type of data</option>
-              <option value="1">Exam</option>
-              <option value="2">Lecture slides</option>
-              <option value="3">Lecture notes</option>
-              <option value="4">Course material</option>
-            </select>
-            <div class="input-group-append">
-              <button class="btn btn-primary " type="button">Submit</button>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <div class="card container mt-5" style="width: 20rem;">
         <div class="card-body">
           <h5 class="card-title">Sannolikhet och statistik</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-            content.</p>
           <input class="form-control" id="formFileLg" type="file">
+          <input class="form-control" id="fileName" type="text" placeholder="Name of file">
+          <input class="form-control" id="fileDesc" type="text" placeholder="Description of file">
           <div class="input-group">
             <select class="custom-select" id="inputGroupSelect04" style="flex: 1;">
               <option selected>Choose type of data</option>
-              <option value="1">Exam</option>
-              <option value="2">Lecture slides</option>
-              <option value="3">Lecture notes</option>
-              <option value="4">Course material</option>
+              <option value="1">Lectures</option>
+              <option value="2">Videos</option>
+              <option value="3">Quizzes</option>
+              <option value="4">Exams</option>
             </select>
             <div class="input-group-append">
-              <button class="btn btn-primary " type="button">Submit</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card container mt-5" style="width: 20rem; ">
-        <div class="card-body">
-          <h5 class="card-title">Linjär algebra 1</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-            content.</p>
-          <input class="form-control" id="formFileLg" type="file">
-          <div class="input-group">
-            <select class="custom-select" id="inputGroupSelect04" style="flex: 1;">
-              <option selected>Choose type of data</option>
-              <option value="1">Exam</option>
-              <option value="2">Lecture slides</option>
-              <option value="3">Lecture notes</option>
-              <option value="4">Course material</option>
-            </select>
-            <div class="input-group-append">
-              <button class="btn btn-primary " type="button">Submit</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card container mt-5" style="width: 20rem;">
-        <div class="card-body">
-          <h5 class="card-title">Linjär algebra 2</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
-            content.</p>
-          <input class="form-control" id="formFileLg" type="file">
-          <div class="input-group">
-            <select class="custom-select" id="inputGroupSelect04" style="flex: 1;">
-              <option selected>Choose type of data</option>
-              <option value="1">Exam</option>
-              <option value="2">Lecture slides</option>
-              <option value="3">Lecture notes</option>
-              <option value="4">Course material</option>
-            </select>
-            <div class="input-group-append">
-              <button class="btn btn-primary " type="button">Submit</button>
+              <button class="btn btn-primary " type="button" onclick="">Submit</button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+-->
+
+  <div class="container mt-5" style="margin-bottom: 5rem;">
+    <div id="mycard">
+      <div class="row" id="upload">
+
+
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // Call your function here
+    document.addEventListener("DOMContentLoaded", function () {
+      try {
+        console.log("Generating upload");
+        generateUpload();
+      } catch (error) {
+        console.error("Error retrieving upload", error);
+      }
+
+    });
+  </script>
+
+
+
+
 
   <script>
     var firebaseConfig = {
@@ -345,9 +312,9 @@
       });
     }
 
-    document.getElementById('googleSignInButton').addEventListener('click', event_login);
+    //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
-    document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
+    //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
