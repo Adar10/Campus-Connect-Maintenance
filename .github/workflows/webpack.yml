@@ -23,6 +23,10 @@ jobs:
 #        npm install
 #        npx webpack
 
+    - name: installing jest
+      run: |
+        npm install jest
+
     - name: Testing
       run: |
         npm test
