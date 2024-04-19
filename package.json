@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "firebase": "^10.9.0"
+    "firebase": "^10.9.0",
+    "firebase-tools": "^13.7.2"
   },
   "name": "campus-connect",
   "version": "1.0.0",
@@ -20,7 +21,8 @@
     "test": "jest",
     "build": "webpack",
     "serve": "concurrently \"npm run build\" \"firebase serve\"",
-    "deploy": "concurrently \"npm run build\" \"firebase deploy\""
+    "deploy": "concurrently \"npm run build\" \"firebase deploy\"",
+    "clean": "concurrently \"rm public\\bundle.js\" \"del public\\bundle.js\""
   },
   "jest": {
     "testEnvironment": "node",

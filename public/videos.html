@@ -37,6 +37,7 @@
 
 
     #filter {
+        background-image: url('/css/searchicon.png');
         /* Add a search icon to input */
         background-position: 10px 12px;
         /* Position the search icon */
@@ -105,7 +106,7 @@
             <ul class="navbar-nav mr-auto">
 
                 <li class="nav-item active">
-                    <a class="nav-link" href="home.html">Home <span class="sr-only">(Current)</span></a>
+                    <a class="nav-link" href="index.html">Home <span class="sr-only">(Current)</span></a>
                 </li>
 
                 <li class="nav-item">
@@ -120,62 +121,41 @@
             </ul>
         </div>
     </nav>
-    <!--End of navbar-->
 
-    <!--Start of header-->
-
-    <div class="container-fluid p-5 bg-info text-black text-center">
-        <h1>Campus Connect</h1>
-        <p>Welcome to our free to use study website</p>
+    <div class="container-fluid p-5 bg-info text-white text-center">
+        <h1 id="coursename">Template for navbar and footer</h1>
     </div>
-    <!--End of header-->
 
 
 
-    <script>
-        // Call your function here
-        document.addEventListener("DOMContentLoaded", function () {
-            try {
-                generateCourseNavigation();
-            } catch (error) {
-                console.error("Error creating document", error);
-            }
-
-        });
-        document.addEventListener("DOMContentLoaded", function () {
-            try {
-                generateCourseExams();
-            } catch (error) {
-                console.error("Error retrieving exams", error);
-            }
-
-        });
-
+    <script type="text/javascript">
+        //localStorage.setItem("highScore","564544");
+        var courseName = localStorage.getItem("course");
+        // Considering you already have highScore set in local storage.
+        // Uncomment your line number 10 if you want to set in local storage
+        document.getElementById('coursename').innerHTML = courseName;
     </script>
 
+    <div class="container-fluid mt-5">
+        <div class="bg-info">
+            <div class="btn-group container-fluid" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
+                <label class="btn btn-outline-light " for="btnradio1"
+                    onclick="window.location.href='lectures.html';">Lectures</label>
 
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+                <label class="btn btn-outline-light" for="btnradio2">Videos</label>
 
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                <label class="btn btn-outline-light" for="btnradio3">Quizzes</label>
 
-    <div class="container mt-5 bg-info" style="margin-bottom: 5rem;">
-        <h2>Search for courses</h2>
-        <input type="text" id="filter" onkeyup="myFunction()" placeholder="Course name..">
-        <div class="row text-center" id="mycard">
-            <div id="navigation">
-
+                <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
+                <label class="btn btn-outline-light" for="btnradio4" style="font-size: 100%;"
+                    onclick="window.location.href='exam.html';">Exams</label>
             </div>
         </div>
     </div>
 
-
-
-    <script>
-        $("#filter").on("keyup", function () {
-            var value = $(this).val().toLowerCase();
-            $("#mycard > div > button").filter(function () {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
-        });
-    </script>
     <script>
         var firebaseConfig = {
             apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
@@ -220,10 +200,12 @@
             var status = localStorage.getItem("myVariable");
             if (status === "false") {
                 event_login();
+                document.getElementById("login_status").innerHTML = "Logout"
 
             }
             else {
                 event_logout();
+                document.getElementById("login_status").innerHTML = "Login"
 
             }
         }
@@ -256,7 +238,6 @@
             firebase.auth().signInWithPopup(provider).then(function (result) {
                 var user = result.user;
                 console.log("Signed in", user)
-                document.getElementById("login_status").innerHTML = "Logout"
             }).catch(function (error) {
                 console.error(error);
             });
@@ -265,15 +246,14 @@
         function signOutWithGoogle() {
             firebase.auth().signOut().then(() => {
                 console.log("Signed out");
-                document.getElementById("login_status").innerHTML = "Login"
             }).catch((error) => {
                 console.error(error);
             });
         }
 
-        //document.getElementById('googleSignInButton').addEventListener('click', event_login);
+        document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
-        //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
+        document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
