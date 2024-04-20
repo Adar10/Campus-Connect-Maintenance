@@ -85,6 +85,58 @@
     background-color: #eee;
     /* Add a hover effect to all links, except for headers */
   }
+
+  /* START OF MODAL CSS*/
+
+  /* The Modal (background) */
+  .modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 2;
+    /* Sit on top */
+    padding-top: 100px;
+    /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+  }
+
+  /* Modal Content */
+  .modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+  }
+
+  /* The Close Button */
+  .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  /*END OF MODAL CSS*/
 </style>
 
 <body class="bg-info" onload="set_name()">
@@ -123,20 +175,24 @@
   </nav>
   <!--End of navbar-->
 
+
+
   <!--Start of header-->
 
   <div class="container-fluid p-5 bg-info text-white text-center">
-    <h1 id="coursename">Template for navbar and footer</h1>
+    <h1 id="coursename">Upload to our database</h1>
   </div>
 
+  <!-- THIS CODE IS NO LONGER NEEDED
 
   <script type="text/javascript">
     //localStorage.setItem("highScore","564544");
     var courseName = localStorage.getItem("course");
     // Considering you already have highScore set in local storage.
     // Uncomment your line number 10 if you want to set in local storage
-    document.getElementById('coursename').innerHTML = "Upload to " + courseName;
+    document.getElementById('coursename').innerHTML = "Upload to our database";
   </script>
+  -->
   <!--End of header-->
 
   <div class="container mt-5 bg-info" style="margin-bottom: 5rem;">
@@ -148,6 +204,17 @@
       </div>
     </div>
   </div>
+
+  <!-- Start of Modal -->
+  <div id="myModal" class="modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h5>Uploading guidelines and restrictions</h5>
+      <p>Some text in the Modal..</p>
+    </div>
+  </div>
+  <!--End of Modal-->
 
 
 
@@ -383,7 +450,7 @@
                 <a href="frame3.html" class="text-white">Your Account</a>
               </p>
               <p>
-                <a href="#!" class="text-white">Uploading guidelines</a>
+                <a id="link" href="#myModal" class="text-white">Uploading guidelines</a>
               </p>
               <p>
                 <a href="#!" class="text-white">User agreement</a>
@@ -423,6 +490,39 @@
 
   </div>
   <!-- End of .container -->
+
+  <!--Start of Modal script-->
+  <script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("myBtn");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    var link = document.getElementById("link");
+
+
+    // When the user clicks the button, open the modal 
+    link.addEventListener('click', () => {
+      modal.style.display = "block";
+    });
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+  <!--End of Modal script-->
 
 
 
