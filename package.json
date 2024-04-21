@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "firebase": "^10.9.0",
-    "firebase-tools": "^13.7.2"
+    "firebase-tools": "^13.7.2",
+    "jsdoc": "^4.0.2"
   },
   "name": "campus-connect",
   "version": "1.0.0",
