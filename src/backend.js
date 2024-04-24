@@ -44,6 +44,42 @@ const db = getFirestore();
 const storage = getStorage();
 
 /**
+ * Asynchronously retrieves the download URL for a file stored in Firebase Storage based on a given path.
+ * This function creates a reference to a storage location using the provided path, attempts to get the download URL,
+ * and logs the URL or an error if the operation fails.
+ *
+ * @async
+ * @function getFileDownloadURL
+ * @param {string} path - The path in Firebase Storage from which to retrieve the file's download URL.
+ * @returns {Promise<string|null>} The download URL of the file if successful, otherwise null.
+ */
+export async function getFileDownloadURL(path) {
+  try {
+    const fileRef = ref(storage, path);
+    const downloadURL = await getDownloadURL(fileRef);
+    console.log("Download URL:", downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error getting download URL:", error);
+    return null;
+  }
+}
+
+/**
+ * Asynchronously retrieves all courses from a Firestore collection named "kurser".
+ * The function queries the Firestore collection, extracts data from each document,
+ * and returns it as an array of objects, each representing a course.
+ * 
+ * @async
+ * @function getCourses
+ * @returns {Promise<Array<Object>>} An array of objects, each representing a course, extracted from Firestore documents.
+ */
+export async function getCourses() {
+  const snapshot = await getDocs(collection(db, "kurser"));
+  return snapshot.docs.map(doc => doc.data());
+}
+
+/**
  * Creates a new reference to the specified tenta.
  * @async
  * @function
@@ -243,4 +279,5 @@ window.getFileDownloadURL = getFileDownloadURL;
 // Expose storageCreateCourse function globally for usage
 window.storageCreateCourse = storageCreateCourse;
 
+// Expose uploadFile function globally for usage
 window.uploadFile = uploadFile;

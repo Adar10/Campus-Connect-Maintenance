@@ -1,43 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, get, getDoc } from 'firebase/firestore';
-import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage';
+import {getDoc } from 'firebase/firestore';
+import {getCourses, getFileDownloadURL} from 'frame2.js'
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
-  authDomain: "campusconnect-30c4a.firebaseapp.com",
-  databaseURL: "https://campusconnect-30c4a-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "campusconnect-30c4a",
-  storageBucket: "campusconnect-30c4a.appspot.com",
-  messagingSenderId: "728123265116",
-  appId: "1:728123265116:web:2d24f83a222e156fe4d699",
-  measurementId: "G-YRMP4KDMNX"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-
-const db = getFirestore();
-
-const storage = getStorage();
-
-async function getFileDownloadURL(path) {
-  try {
-    const fileRef = ref(storage, path);
-    const downloadURL = await getDownloadURL(fileRef);
-    console.log("Download URL:", downloadURL);
-    return downloadURL;
-  } catch (error) {
-    console.error("Error getting download URL:", error);
-    return null;
-  }
-}
-
-
-async function getCourses() {
-  const snapshot = await getDocs(collection(db, "kurser"));
-  return snapshot.docs.map(doc => doc.data());
-}
-
-
+/**
+ * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.
+ * This function retrieves a list of courses from `getCourses`, then iterates through each course to dynamically create a navigational button.
+ * Each button includes an anchor link that, when clicked, stores course information in localStorage and navigates to a `lectures.html` page with related content.
+ * @async
+ * @function generateCourseNavigation
+ * @returns {Promise<void>} Does not explicitly return a value; results in side effects in the DOM and localStorage.
+ */
 async function generateCourseNavigation() {
   const courses = await getCourses();
   console.log(courses);
@@ -49,7 +20,7 @@ async function generateCourseNavigation() {
     link.addEventListener('click', () => {
       localStorage.setItem("course", course.name);
       localStorage.setItem("ID", course.ID);
-      console.log(courseID);
+      console.log(course.ID);
     });
     link.style.textDecoration = "none";
     link.style.color = "black";
@@ -64,26 +35,24 @@ async function generateCourseNavigation() {
       window.location.href = 'lectures.html';
       localStorage.setItem("course", course.name);
     });
-    // button.style.width = "20rem";
-
-    //const div_container = document.createElement("div");
-    //div_container.classList.add("card", "container", "mt-5");
-    // div_container.style.width = "20rem";
-
-    // const div_body = document.createElement("div");
-    // div_body.classList.add("card-body");
 
     h5.appendChild(link);
     button.appendChild(h5);
     nav.appendChild(button);
-
-    // div_body.appendChild(h5);
-    // div_container.appendChild(div_body);
-    //nav.appendChild(div_container);
     nav.style.width = "100%";
   });
 }
 
+/**
+ * Asynchronously generates and displays cards for each exam associated with a course retrieved from Firestore.
+ * The function fetches the course ID from localStorage, uses it to construct a Firestore document reference, and retrieves the document.
+ * If the document exists and contains data, it processes each field in the document (expected to be an exam-related data array),
+ * creates a card for each exam, and attaches an event listener to a button on the card that attempts to open a file URL when clicked.
+ * 
+ * @async
+ * @function generateCourseExams
+ * @returns {Promise<void>} Executes asynchronous operations and manipulates the DOM, but returns no value.
+ */
 async function generateCourseExams() {
 
   var courseID = localStorage.getItem("ID");
@@ -140,8 +109,17 @@ async function generateCourseExams() {
     console.log("No such document!");
   }
 
-
 }
+
+/**
+ * Asynchronously generates exam cards for a specific course and appends them to a specified element in the DOM.
+ * This function retrieves a course ID from localStorage, then uses it to fetch exam data from a Firestore collection.
+ * Each exam entry is displayed in a card with a clickable button that, when clicked, attempts to open a document or file related to the exam.
+ * 
+ * @async
+ * @function generateCourseExams
+ * @returns {Promise<void>} Does not return a value but performs DOM manipulations and might open new browser tabs based on user interaction.
+ */
 
 async function generateCourseLectures() {
 
@@ -203,12 +181,15 @@ async function generateCourseLectures() {
     console.log("No such document!");
   }
 
-
 }
 
-
+// Expose generateCourseLectures function globally for usage
 window.generateCourseLectures = generateCourseLectures;
+
+// Expose generateCourseExams function globally for usage
 window.generateCourseExams = generateCourseExams;
+
+// Expode generateCourseNavigation function globally for usage
 window.generateCourseNavigation = generateCourseNavigation;
 
 
