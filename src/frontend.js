@@ -1,5 +1,5 @@
-import {getDoc } from 'firebase/firestore';
-import {getCourses, getFileDownloadURL} from 'frame2.js'
+import {getDoc, doc } from 'firebase/firestore';
+import {getCourses, getFileDownloadURL, getDB} from './backend.js'
 
 /**
  * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.
@@ -126,7 +126,7 @@ async function generateCourseLectures() {
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(db, courseID, "Lectures");
+  const docRef = doc(getDB(), courseID, "Lectures");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("lectures");

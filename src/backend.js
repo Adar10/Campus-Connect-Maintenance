@@ -40,6 +40,10 @@ const firebaseApp = initializeApp(firebaseConfig);
 // Get Firestore database instance
 const db = getFirestore();
 
+export function getDB() {
+  return db;
+}
+
 // Get a reference to the storage service
 const storage = getStorage();
 
@@ -99,26 +103,6 @@ async function getFileRef(courseID, category, fileName) {
 
   } catch (error) {
     console.error("Error creating reference:", error);
-    return null;
-  }
-}
-
-/**
- * Creates a new downloadURL to the specified file.
- * @async
- * @function
- * @param {string} path - The path of the file in our storage.
- * @returns {Object|null} - A Promise that resolves with the download URL for this object,
- * or null if the file does not exist or an error occurs.
- */
-async function getFileDownloadURL(path) {
-  try {
-    const fileRef = ref(storage, path);
-    const downloadURL = await getDownloadURL(fileRef);
-    console.log("Download URL:", downloadURL);
-    return downloadURL;
-  } catch (error) {
-    console.error("Error getting download URL:", error);
     return null;
   }
 }
