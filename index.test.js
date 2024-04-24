@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { createDocument, updateDocument, readDocuments, deleteDocument } from './src/frame2';
+import { createDocument, updateDocument, readDocuments, deleteDocument } from './src/backend.js';
 jest.mock('firebase/app');
 jest.mock('firebase/firestore');
 
