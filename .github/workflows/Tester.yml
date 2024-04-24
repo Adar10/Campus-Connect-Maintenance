@@ -1,0 +1,23 @@
+name: Tester
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    
+
+    - name: installing jest
+      run: |
+        npm install jest
+
+    - name: Testing
+      run: |
+        npm test
