@@ -15,7 +15,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "serve": "concurrently \"npm run build\" \"firebase serve\"",
-    "deploy": "concurrently \"npm run build\" \"firebase deploy\""
+    "deploy": "concurrently \"npm run build\" \"firebase deploy\"",
+    "clean": "concurrently \"rm public\\bundle.js\" \"del public\\bundle.js\""
   },
   "keywords": [],
   "author": "",

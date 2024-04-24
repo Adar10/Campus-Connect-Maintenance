@@ -64,22 +64,11 @@ async function generateCourseNavigation() {
       window.location.href = 'lectures.html';
       localStorage.setItem("course", course.name);
     });
-    // button.style.width = "20rem";
-
-    //const div_container = document.createElement("div");
-    //div_container.classList.add("card", "container", "mt-5");
-    // div_container.style.width = "20rem";
-
-    // const div_body = document.createElement("div");
-    // div_body.classList.add("card-body");
 
     h5.appendChild(link);
     button.appendChild(h5);
     nav.appendChild(button);
 
-    // div_body.appendChild(h5);
-    // div_container.appendChild(div_body);
-    //nav.appendChild(div_container);
     nav.style.width = "100%";
   });
 }
@@ -236,14 +225,10 @@ async function generateCourseVideos() {
         iframe.referrerPolicy = "strict-origin-when-cross-origin";
         iframe.setAttribute('allowFullScreen', '');
         iframe.style.margin = "3rem";
-        // iframe.classList.add("embed-responsive-item");
-
 
 
 
         row.appendChild(iframe);
-        // title = "YouTube video player" frameborder = "0" allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy = "strict-origin-when-cross-origin" allowfullscreen ></iframe >
-        // frameborder="0" ayroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
       }
     }
@@ -417,11 +402,11 @@ async function submitFile(courseID) {
 
   console.log(file.name);
   if (selectedValue == 1) {
-    uploadFile(courseID, "Exams", file.name, desc, file);
-  } else if (selectedValue == 2) {
     uploadFile(courseID, "Lectures", file.name, desc, file);
+  } else if (selectedValue == 2) {
+    uploadFile(courseID, "Videos", file.name, desc, file);
   } else if (selectedValue == 3) {
-    uploadFile(courseID, "Exams", file.name, desc, file);
+    uploadFile(courseID, "Quiz", file.name, desc, file);
   } else if (selectedValue == 4) {
     uploadFile(courseID, "Exams", file.name, desc, file);
   }
