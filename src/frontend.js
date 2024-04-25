@@ -1,5 +1,5 @@
-import {getDoc, doc } from 'firebase/firestore';
-import {getCourses, getFileDownloadURL, getDB} from './backend.js'
+import { getDoc, doc } from 'firebase/firestore';
+import { getCourses, getFileDownloadURL, getDB } from './backend.js'
 
 /**
  * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.

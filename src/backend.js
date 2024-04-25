@@ -1,9 +1,9 @@
-  /**
- * Initializes the Firebase app with the provided configuration.
- * @function
- * @param {Object} firebaseConfig - The Firebase configuration object.
- * @returns {Object} The initialized Firebase app.
- */
+/**
+* Initializes the Firebase app with the provided configuration.
+* @function
+* @param {Object} firebaseConfig - The Firebase configuration object.
+* @returns {Object} The initialized Firebase app.
+*/
 import { initializeApp } from 'firebase/app';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
@@ -190,14 +190,14 @@ async function storageCreateCourse(collectionID) {
  * @returns {string|null} The ID of the newly created document, or null if an error occurred.
  */
 async function createDocument(collectionName, data) {
-    try {
-      const docRef = await addDoc(collection(db, collectionName), data);
-      console.log("Document created", docRef.id);
-      return docRef.id;
-    } catch (error) {
-      console.error("Error creating ", error);
-      return null;
-    }
+  try {
+    const docRef = await addDoc(collection(db, collectionName), data);
+    console.log("Document created", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error creating ", error);
+    return null;
+  }
 }
 
 /**
@@ -209,13 +209,13 @@ async function createDocument(collectionName, data) {
  * @param {Object} data - The updated data for the document.
  */
 async function updateDocument(collectionName, docId, data) {
-    try {
-      const washingtonRef = doc(db, collectionName, docId);
-      await updateDoc(washingtonRef, data);
-      console.log("Update completed");
-    } catch (error) {
-      console.error("Error updating: ", error);
-    }
+  try {
+    const washingtonRef = doc(db, collectionName, docId);
+    await updateDoc(washingtonRef, data);
+    console.log("Update completed");
+  } catch (error) {
+    console.error("Error updating: ", error);
+  }
 }
 
 /**
@@ -227,15 +227,15 @@ async function updateDocument(collectionName, docId, data) {
  * @param {any} value - The value to filter documents by.
  */
 async function readDocuments(collectionName, field, value) {
-    try {
-      const q = query(collection(db, collectionName), where(field, "==", value));
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id);
-      });
-    } catch (error) {
-      console.error("Error reading: ", error);
-    }
+  try {
+    const q = query(collection(db, collectionName), where(field, "==", value));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id);
+    });
+  } catch (error) {
+    console.error("Error reading: ", error);
+  }
 }
 
 /**
@@ -246,12 +246,12 @@ async function readDocuments(collectionName, field, value) {
  * @param {string} docId - The ID of the document to be deleted.
  */
 async function deleteDocument(collectionName, docId) {
-    try {
-      await deleteDoc(doc(db, collectionName, docId));
-      console.log("Deletion completed");
-    } catch (error) {
-      console.error("Error deleting: ", error);
-    }
+  try {
+    await deleteDoc(doc(db, collectionName, docId));
+    console.log("Deletion completed");
+  } catch (error) {
+    console.error("Error deleting: ", error);
+  }
 }
 
 // Expose createDocument function globally for usage

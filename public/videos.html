@@ -92,7 +92,7 @@
 
     <!-- Start of navbar-->
     <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="index.html">
             <img src="CampusConnect.png" height="30" class="d-inline-block align-top" alt=""
                 style="padding-inline-start: 5%;">
             Campus Connect
@@ -111,6 +111,10 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="upload.html">Upload</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="account.html">Account</a>
                 </li>
 
                 <li class="nav-item">
@@ -155,6 +159,33 @@
             </div>
         </div>
     </div>
+
+
+
+
+
+    <div class="justify-content: center" id="videos" style="margin-bottom: 5rem;">
+
+    </div>
+
+
+
+
+
+    <script>
+        // Call your function here
+        document.addEventListener("DOMContentLoaded", function () {
+            try {
+                generateCourseVideos();
+            } catch (error) {
+                console.error("Error retrieving videos", error);
+            }
+
+        });
+
+    </script>
+
+
 
     <script>
         var firebaseConfig = {
