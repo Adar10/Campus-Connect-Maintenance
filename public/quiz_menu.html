@@ -149,34 +149,77 @@
         </div>
     </div>
 
-    <!--quizzes-->
     <div class="container mt-5">
-        <div class="row">
-            <div class="col-lg-8" id="quizzes">
-                
-            </div>
-            <div class="col-lg-4">
-                <div class="add-quiz-container">
-                    <button class="btn btn-primary btn-sm">Add a quiz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+        <button id="add-quiz-btn" class="btn btn-primary">Add a Quiz</button>
+      </div>
 
-    <style>
-        .add-quiz-container {
-            background-color: blue;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-        }
+<!-- Add Quiz Modal -->
+<div class="modal fade" id="addQuizModal" tabindex="-1" role="dialog" aria-labelledby="addQuizModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addQuizModalLabel">Add a Quiz</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="quiz-name" placeholder="Name of quiz"><br>
+          <button id="submit-name-btn" class="btn btn-primary btn-sm">Submit Name</button>
+          <div id="questions-container" style="display: none;">
+            <button id="add-question-btn" class="btn btn-primary btn-sm">Add a Question</button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="save-quiz-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Question Template -->
+  <template id="question-template">
+    <div class="question-inputs">
+      <input type="text" class="question" placeholder="Enter the question"><br>
+      <input type="text" class="correct-answer" placeholder="Enter the correct answer"><br>
+      <input type="text" class="incorrect-answer1" placeholder="Enter incorrect answer 1"><br>
+      <input type="text" class="incorrect-answer2" placeholder="Enter incorrect answer 2"><br>
+      <input type="text" class="incorrect-answer3" placeholder="Enter incorrect answer 3"><br>
+      <button class="btn btn-primary btn-sm submit-question-btn">Submit Question</button>
+    </div>
+  </template>
+  
+
+  
+  <script>
+    $('#add-quiz-btn').click(function() {
+      $('#addQuizModal').modal('show');
+      $('#quiz-name').show();
+      $('#submit-name-btn').show();
+      $('#questions-container').hide(); 
+    });
     
-        .add-quiz-container button {
-            width: 50%;
-        }
-    </style>
+    $('#submit-name-btn').click(function() {
+      $('#questions-container').show();
+      $('#quiz-name').hide();
+      $(this).hide();
+    });
+    
+    $('#add-question-btn').click(function() {
+    if ($('.question-inputs').length === 0) {
+    var questionInputs = $($('#question-template').html());
+
+    $('#questions-container').append(questionInputs);
+    }
+    });
+    
+    $('#save-quiz-btn').click(function() {
+      $('#addQuizModal').modal('hide');
+    });
+  </script>
+  
+  
+    
 
     <div class="container mt-5" style="margin-bottom: 5rem;">
         <div class="row" id="quizzes">
@@ -184,6 +227,22 @@
         </div>
     </div>
 
+    <script>
+        $(document).ready(function() {
+          $('#submit-name-btn').click(function() {
+            createQuiz();
+          });
+        });
+      </script>
+
+    <script>
+        $(document).on('click', '.submit-question-btn', function() {
+        $('#add-question-btn').prop('disabled', false);
+        addQuizQuestions();
+        
+        });
+    </script>
+    
 
 
 
@@ -298,6 +357,8 @@
 
         getAllQuizzes();
     </script>
+
+
 
 
     <style>

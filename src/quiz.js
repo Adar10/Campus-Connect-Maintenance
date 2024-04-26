@@ -1,10 +1,12 @@
 import { initializeApp } from "firebase/app";  
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, getDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, getDoc, arrayUnion } from "firebase/firestore";
 
 import { getDB } from './backend.js';
  
 
 // DOM elements
+
+//TODO: Documentation
 
 const questionElem = document.getElementById("question");
 const answerButtons = document.getElementById("answer-buttons"); 
@@ -12,10 +14,76 @@ const nextButton = document.getElementById("next-btn");
 
 const db = getDB();
 
+async function createQuiz() {
+    var courseID = localStorage.getItem("ID");
+
+    var quizName = document.getElementById("quiz-name").value;
+
+    const docRef = doc(db, courseID, "Quizzes");
+    
+    const docSnap = collection(docRef, "all-quizzes");
+
+    const docs = await getDocs(docSnap);
+
+    let quizExists = false;
+    docs.forEach((doc) => {
+        if (doc.id === quizName) {
+        quizExists = true;
+        }
+    });
+        if (quizExists) {
+            //TODO: Fixa error handling
+            console.log("A quiz with this name already exists. Please choose another name.");
+        } else {
+            const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName); 
+
+            await setDoc(quizDocRef, {
+                questions: []
+            });
+            console.log("Document successfully created");
+        }
+}
+
+
+async function addQuizQuestions() {
+    var courseID = localStorage.getItem("ID");
+    var quizName = document.getElementById("quiz-name").value;
+    const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName); 
+
+   
+    var questionInputs = $('.question-inputs');
+
+    questionInputs.each(async function() {
+        var inputQuestion = $(this).find('.question').val();
+        var correctAns = $(this).find('.correct-answer').val();
+        var incorrectAnswer1 = $(this).find('.incorrect-answer1').val();
+        var incorrectAnswer2 = $(this).find('.incorrect-answer2').val();
+        var incorrectAnswer3 = $(this).find('.incorrect-answer3').val();
+
+        var newQuestion = {
+            correctAnswer: correctAns,
+            incorrectAnswers: [incorrectAnswer1, incorrectAnswer2, incorrectAnswer3],
+            question: inputQuestion
+        };
+
+        await updateDoc(quizDocRef, {
+            questions: arrayUnion(newQuestion)
+        });
+
+        // Clear question inputs
+        $(this).find('input').val('');
+    });
+
+    console.log("Document updated")
+}
+
+
+
 function getAllQuizzes() {
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
 
+    //TODO: Hitta bättre sätt att komma åt subcollection
     const docRef = doc(db, courseID, "Quizzes");
 
     const docSnap = collection(docRef ,"all-quizzes");
@@ -55,10 +123,8 @@ async function fetchQuiz(quizID) {
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
   
-    // Access document Quizzes
     const docRef = doc(db, courseID, "Quizzes");
     
-    // Access collection all-quizzes
     const docSnap = collection(docRef ,"all-quizzes");
     console.log(docSnap);
 
@@ -76,7 +142,6 @@ async function fetchQuiz(quizID) {
         const wrongAnswersMap = questionItem.incorrectAnswers;
         const questionText = questionItem.question;
     
-        // Convert the wrongAnswers map into an array
         const wrongAnswersArray = Object.values(wrongAnswersMap);
     
         var allAnswers = [correctAnswer, ...wrongAnswersArray];
@@ -96,14 +161,11 @@ async function fetchQuiz(quizID) {
 }
 
   
-  // Variables to track quiz progress and score
   let currentQuestionIndex = 0; 
   let questionNumber = 1;
   let score = 0; 
-  //Global variable for all elements in quiz
   let questions = [];
   
-  // Start the quiz with the given questions array
   async function startQuiz(quizID) {
     
     let quizQuestion = await fetchQuiz(quizID);
@@ -141,7 +203,6 @@ async function fetchQuiz(quizID) {
  
     console.log("here");
     
-    // Loop through each answer and create buttons for them
     currentQuestions.answers.forEach(answer => {
         const button = document.createElement("button"); 
         button.innerHTML = answer;
@@ -211,3 +272,5 @@ async function fetchQuiz(quizID) {
 window.fetchQuiz = fetchQuiz;
 window.startQuiz = startQuiz;
 window.getAllQuizzes = getAllQuizzes;
+window.createQuiz = createQuiz;
+window.addQuizQuestions = addQuizQuestions;

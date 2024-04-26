@@ -12,8 +12,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
 
+
+    <style>
+        #back-arrow {
+            position: absolute;
+            top: 50px;
+            color: white;
+            left: 50px;
+            font-size: 50px;
+            text-decoration: none;
+        }
+    </style>
+
+
 </head>
 <body>
+
+    <a href="quiz_menu.html" id="back-arrow">&larr;</a>
+
     <div class="app">
         <h1>Quiz subject</h1>
         <div class="quiz">
@@ -39,6 +55,10 @@
                
             localStorage.removeItem("selectedQuizID");
             
+        });
+        
+        document.getElementById("add-quiz-btn").addEventListener("click", function() {
+            createQuiz();
         });
     </script>
 
