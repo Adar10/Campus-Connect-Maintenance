@@ -12,6 +12,37 @@ const nextButton = document.getElementById("next-btn");
 
 const db = getDB();
 
+function getAllQuizzes() {
+    var courseID = localStorage.getItem("ID");
+    console.log(courseID);
+
+    const docRef = doc(db, courseID, "Quizzes");
+
+    const docSnap = collection(docRef ,"all-quizzes");
+
+    getDocs(docSnap).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            const quizID = doc.id; 
+            const button = document.createElement("button"); 
+            button.innerHTML = quizID; 
+            button.classList.add("btn"); 
+            
+            button.addEventListener("click", function() {
+                
+                localStorage.setItem("selectedQuizID", quizID);
+                
+                window.location.href = "quiz.html";
+            });
+            
+            document.getElementById('quizzes').appendChild(button);
+        });
+    }).catch((error) => {
+        console.log("Error getting documents: ", error);
+    });
+}
+
+
+
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -19,8 +50,7 @@ function shuffleArray(array) {
     }
 }
 
-async function fetchQuiz() {
-    var allquizzes = [];
+async function fetchQuiz(quizID) {
 
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
@@ -28,52 +58,41 @@ async function fetchQuiz() {
     // Access document Quizzes
     const docRef = doc(db, courseID, "Quizzes");
     
-
     // Access collection all-quizzes
     const docSnap = collection(docRef ,"all-quizzes");
     console.log(docSnap);
 
-    if (docSnap) {
-        await getDocs(docSnap).then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                // Access the fields
-                const questionsData = doc.data().questions;
-                const subject = doc.data().subject;
-                let docQuestions = [];
-    
-                // Process each question
-                if (questionsData) {
-                    questionsData.forEach((questionItem) => {
-                        const correctAnswer = questionItem.correctAnswer;
-                        const wrongAnswersMap = questionItem.incorrectAnswers;
-                        const questionText = questionItem.question;
-    
-                        // Convert the wrongAnswers map into an array
-                        const wrongAnswersArray = Object.values(wrongAnswersMap);
-    
-                        // Combine correct and wrong answers and shuffle them
-                        var allAnswers = [correctAnswer, ...wrongAnswersArray];
-                        shuffleArray(allAnswers);
-    
-                        // Push each question into the questions array
-                        docQuestions.push({
-                            question: questionText,
-                            answers: allAnswers,
-                            correctAnswer: correctAnswer
-                        });
-                    });
-                }
-            
-                allquizzes.push(docQuestions);
-            });
+    const quizDocRef = doc(docSnap, quizID);
+    const quizDocSnap = await getDoc(quizDocRef);
 
-            
-        });
-        
-        
-    }
-    return allquizzes;
     
+    const questionsData = quizDocSnap.data().questions;
+    let docQuestions = [];
+    
+            
+    if (questionsData) {
+        questionsData.forEach((questionItem) => {
+        const correctAnswer = questionItem.correctAnswer;
+        const wrongAnswersMap = questionItem.incorrectAnswers;
+        const questionText = questionItem.question;
+    
+        // Convert the wrongAnswers map into an array
+        const wrongAnswersArray = Object.values(wrongAnswersMap);
+    
+        var allAnswers = [correctAnswer, ...wrongAnswersArray];
+        shuffleArray(allAnswers);
+    
+        docQuestions.push({
+            question: questionText,
+            answers: allAnswers,
+            correctAnswer: correctAnswer
+            });
+        
+        });
+        console.log(docQuestions);
+    }
+       
+    return docQuestions;            
 }
 
   
@@ -85,21 +104,29 @@ async function fetchQuiz() {
   let questions = [];
   
   // Start the quiz with the given questions array
-  async function startQuiz() {
-    let questionsArray = [];
-    questionsArray = await fetchQuiz();
-    console.log(questionsArray);
+  async function startQuiz(quizID) {
+    
+    let quizQuestion = await fetchQuiz(quizID);
+    
+    console.log(quizQuestion);
+    console.log("here");
     currentQuestionIndex = 0;
     score = 0;
     nextButton.innerHTML = "Next";
 
-    for (let i = 0; i < questionsArray.length; i++) {
-        questions = questionsArray[i];
-        showQuestion(questionsArray[i]);
+    for (let i = 0; i < quizQuestion.length; i++) {
+        
+        
+        questions = quizQuestion[i];
+        console.log(questions);
+        
+        showQuestion(quizQuestion[i]);
             
         await new Promise(resolve => {
             nextButton.onclick = resolve;
+           
         });
+        
     }
     
   }
@@ -109,15 +136,18 @@ async function fetchQuiz() {
     resetState();
     let currentQuestions = arr; 
     let questionNo = questionNumber++; 
-    questionElem.innerHTML = questionNo + ". " + currentQuestions[currentQuestionIndex].question; 
+    questionElem.innerHTML = questionNo + ". " + currentQuestions.question; 
+    console.log(currentQuestions.question)
+ 
+    console.log("here");
     
     // Loop through each answer and create buttons for them
-    currentQuestions[currentQuestionIndex].answers.forEach(answer => {
+    currentQuestions.answers.forEach(answer => {
         const button = document.createElement("button"); 
         button.innerHTML = answer;
         button.classList.add("btn"); 
         answerButtons.appendChild(button); 
-        if(answer === currentQuestions[currentQuestionIndex].correctAnswer){
+        if(answer === currentQuestions.correctAnswer){
             button.dataset.correct = true; 
         }
         button.addEventListener("click", selectAnswer)
@@ -136,7 +166,11 @@ async function fetchQuiz() {
   // Function to handle user's answer selection
   function selectAnswer(e){
     const selectedBtn = e.target; 
-    const isCorrect = selectedBtn.innerHTML === questions[currentQuestionIndex].correctAnswer; 
+    console.log("here");
+    console.log(questions);
+    console.log("here")
+    
+    const isCorrect = selectedBtn.innerHTML === questions.correctAnswer; 
     if(isCorrect){
         selectedBtn.classList.add("correct");
         score++;  
@@ -145,7 +179,7 @@ async function fetchQuiz() {
     }
     // Disable all buttons after selection
     Array.from(answerButtons.children).forEach(button => {
-        if(button.innerHTML === questions[currentQuestionIndex].correctAnswer){
+        if(button.innerHTML === questions.correctAnswer){
             button.classList.add("correct"); 
         }
         button.disabled = true; 
@@ -176,3 +210,4 @@ async function fetchQuiz() {
 
 window.fetchQuiz = fetchQuiz;
 window.startQuiz = startQuiz;
+window.getAllQuizzes = getAllQuizzes;

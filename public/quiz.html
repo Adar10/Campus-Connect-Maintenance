@@ -29,11 +29,20 @@
     </div>
 
     <script src="bundle.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-  startQuiz();
-});
-</script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+           
+            const selectedQuizID = localStorage.getItem("selectedQuizID");
+            
+            startQuiz(selectedQuizID);
+               
+            localStorage.removeItem("selectedQuizID");
+            
+        });
+    </script>
+
+
 
 </body>
 </html>
