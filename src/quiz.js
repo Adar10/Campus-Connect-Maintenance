@@ -16,33 +16,37 @@ const db = getDB();
 
 async function createQuiz() {
     var courseID = localStorage.getItem("ID");
-
     var quizName = document.getElementById("quiz-name").value;
 
     const docRef = doc(db, courseID, "Quizzes");
-    
     const docSnap = collection(docRef, "all-quizzes");
-
     const docs = await getDocs(docSnap);
 
     let quizExists = false;
     docs.forEach((doc) => {
         if (doc.id === quizName) {
-        quizExists = true;
+            quizExists = true;
         }
     });
-        if (quizExists) {
-            //TODO: Fixa error handling
-            console.log("A quiz with this name already exists. Please choose another name.");
-        } else {
-            const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName); 
 
-            await setDoc(quizDocRef, {
-                questions: []
-            });
-            console.log("Document successfully created");
-        }
+    var errorMessageElement = document.getElementById("error-message");
+
+    if (quizExists) {
+        errorMessageElement.textContent = "A quiz with this name already exists. Please choose another name.";
+    } else {
+        errorMessageElement.textContent = ""; 
+        errorMessageElement.hidden;
+        const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName); 
+        await setDoc(quizDocRef, {
+            questions: []
+        });
+        $('#questions-container').show();
+        $('#quiz-name').hide();
+        $('#submit-name-btn').hide();
+        console.log("Document successfully created");
+    }
 }
+
 
 
 async function addQuizQuestions() {
@@ -74,6 +78,16 @@ async function addQuizQuestions() {
         $(this).find('input').val('');
     });
 
+    var confirmationMessageElement = document.getElementById("confirmation-message");
+    confirmationMessageElement.textContent = "Question submitted successfully!";
+    confirmationMessageElement.style.display = "block"; 
+
+    
+    setTimeout(function() {
+        confirmationMessageElement.style.display = "none";
+    }, 2800); // timeout 2800 milliseconds
+
+
     console.log("Document updated")
 }
 
@@ -93,7 +107,7 @@ function getAllQuizzes() {
             const quizID = doc.id; 
             const button = document.createElement("button"); 
             button.innerHTML = quizID; 
-            button.classList.add("btn"); 
+            button.classList.add("btn", "quizOption-button"); 
             
             button.addEventListener("click", function() {
                 
@@ -160,27 +174,37 @@ async function fetchQuiz(quizID) {
     return docQuestions;            
 }
 
+  //Position of the current question
+  let currentQuestionIndex = 0;
   
-  let currentQuestionIndex = 0; 
+  //Enumerates questions in order of quiz
   let questionNumber = 1;
+
+  //Final score for current quiz
   let score = 0; 
+
+  //length of all questions
+  let allQuestionlength = 0;
+
+  //ID for current quiz
+  var ID;
+
+  //Array with all questions
   let questions = [];
   
   async function startQuiz(quizID) {
     
     let quizQuestion = await fetchQuiz(quizID);
-    
-    console.log(quizQuestion);
-    console.log("here");
+    questionNumber = 1;
     currentQuestionIndex = 0;
     score = 0;
+    allQuestionlength = quizQuestion.length;
+    ID = quizID;
     nextButton.innerHTML = "Next";
 
     for (let i = 0; i < quizQuestion.length; i++) {
         
-        
         questions = quizQuestion[i];
-        console.log(questions);
         
         showQuestion(quizQuestion[i]);
             
@@ -188,9 +212,8 @@ async function fetchQuiz(quizID) {
             nextButton.onclick = resolve;
            
         });
-        
     }
-    
+    showScore();
   }
   
   // Function to display the current question
@@ -199,10 +222,7 @@ async function fetchQuiz(quizID) {
     let currentQuestions = arr; 
     let questionNo = questionNumber++; 
     questionElem.innerHTML = questionNo + ". " + currentQuestions.question; 
-    console.log(currentQuestions.question)
- 
-    console.log("here");
-    
+
     currentQuestions.answers.forEach(answer => {
         const button = document.createElement("button"); 
         button.innerHTML = answer;
@@ -227,9 +247,6 @@ async function fetchQuiz(quizID) {
   // Function to handle user's answer selection
   function selectAnswer(e){
     const selectedBtn = e.target; 
-    console.log("here");
-    console.log(questions);
-    console.log("here")
     
     const isCorrect = selectedBtn.innerHTML === questions.correctAnswer; 
     if(isCorrect){
@@ -252,17 +269,20 @@ async function fetchQuiz(quizID) {
   // Function to display the final score
   function showScore(){
     resetState(); 
-    questionElem.innerHTML = `You scored ${score} out of ${questions.length}!`; 
-    nextButton.innerHTML = "Play Again"; 
+    questionElem.innerHTML = `You scored ${score} out of ${allQuestionlength}!`; 
+    nextButton.innerHTML = "Quit"; 
     nextButton.style.display = "block";
+
+    console.log(ID);
+    nextButton.addEventListener("click", function() {  
+        window.location.href = "quiz_menu.html";
+    });
   }
   
   // Event listener for the "Next" button
   function handleNextButton(){
     currentQuestionIndex++
-    if(currentQuestionIndex < questions.length){
-        showQuestion()
-    }else{
+    if(currentQuestionIndex > allQuestionlength){
         showScore(); 
     }
   }
