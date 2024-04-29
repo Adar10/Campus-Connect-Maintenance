@@ -4,20 +4,28 @@ import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, u
 import { getDB } from './backend.js';
  
 
-// DOM elements
+// DOM elements 
+const questionElem = document.getElementById("question");  //Representing the question display area
+const answerButtons = document.getElementById("answer-buttons");   //Representing the answer buttons container
+const nextButton = document.getElementById("next-btn");  //Representing the next button 
 
-//TODO: Documentation
-
-const questionElem = document.getElementById("question");
-const answerButtons = document.getElementById("answer-buttons"); 
-const nextButton = document.getElementById("next-btn"); 
-
+//Get access to the database
 const db = getDB();
 
+
+/**
+ * Asynchronously creates a new quiz document in the database if a quiz with the same name doesn't exist already.
+ * 
+ * @async
+ * @function createQuiz
+ * @returns {Promise<void>} A promise that resolves once the quiz is created of if it already exists, resolves without creating a duplicate.
+ * @throws {Error} If there is an error creating or checking for the quiz in the database.
+ */
 async function createQuiz() {
     var courseID = localStorage.getItem("ID");
     var quizName = document.getElementById("quiz-name").value;
 
+    //Reference to the quizzes collection in the databse
     const docRef = doc(db, courseID, "Quizzes");
     const docSnap = collection(docRef, "all-quizzes");
     const docs = await getDocs(docSnap);
@@ -48,7 +56,14 @@ async function createQuiz() {
 }
 
 
-
+/**
+ * Asynchronously adds quiz questions to an existing quiz document in the database.
+ * 
+ * @async
+ * @function addQuizQuestions
+ * @returns {Promise<void>} A promise that resolves once all questions are added to the quiz document.
+ * @throws {Error} If there is an error adding questions to the quiz document. 
+ */
 async function addQuizQuestions() {
     var courseID = localStorage.getItem("ID");
     var quizName = document.getElementById("quiz-name").value;
@@ -92,16 +107,22 @@ async function addQuizQuestions() {
 }
 
 
-
+/**
+ * Fetches all quizzes associated with the current course ID from the database and displays them as buttons on the page.
+ * 
+ * @function getAllQuizzes
+ * @returns {void} This function doesn't return a value directly, but fetches and displays quiz buttons asynchronously.
+ * @throws {Error} If there is an error fetching or processing quiz data from the database.
+ */
 function getAllQuizzes() {
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
 
-    //TODO: Hitta bättre sätt att komma åt subcollection
+    // Reference to the Quizzes collection in the database
     const docRef = doc(db, courseID, "Quizzes");
-
     const docSnap = collection(docRef ,"all-quizzes");
 
+    // Fetch all documents in the "all-quizzes" subcollection
     getDocs(docSnap).then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             const quizID = doc.id; 
@@ -109,13 +130,14 @@ function getAllQuizzes() {
             button.innerHTML = quizID; 
             button.classList.add("btn", "quizOption-button"); 
             
+            //Add click event listener to each quiz button
             button.addEventListener("click", function() {
                 
                 localStorage.setItem("selectedQuizID", quizID);
                 
                 window.location.href = "quiz.html";
             });
-            
+            // Append the button to the quizzes container
             document.getElementById('quizzes').appendChild(button);
         });
     }).catch((error) => {
@@ -124,7 +146,13 @@ function getAllQuizzes() {
 }
 
 
-
+/**
+ * Shuffles the elements of an array in place using the Fisher-Yates shuffle algorithm.
+ * 
+ * @function shuffleArray
+ * @param {Array} array - The array to be shuffled
+ * @returns {void} This function shuffles the array in place and does not return a new array. 
+ */
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -132,24 +160,37 @@ function shuffleArray(array) {
     }
 }
 
-async function fetchQuiz(quizID) {
 
+/**
+ * Asynchronously fetches a quiz from the database based on the provided quiz ID.
+ * 
+ * @async
+ * @function fetchQuiz
+ * @param {string} quizID - The ID of the quiz to fetch
+ * @returns {Promise<Array<Object>>} A promise that resolves with an array of objects representing quiz questions.
+ * @throws {Error} If there is an error in fetching the quiz or processing the data.
+ */
+async function fetchQuiz(quizID) {
+    //Retrieve the course id from localStorage
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
-  
+    
+    //Reference to the quizzes collection in the database
     const docRef = doc(db, courseID, "Quizzes");
     
+    //Reference to the specific quiz document
     const docSnap = collection(docRef ,"all-quizzes");
     console.log(docSnap);
 
+    //Get the quiz document snapshot
     const quizDocRef = doc(docSnap, quizID);
     const quizDocSnap = await getDoc(quizDocRef);
 
-    
+    //Extract questions data from the quiz document
     const questionsData = quizDocSnap.data().questions;
     let docQuestions = [];
     
-            
+     //Process each question in the quiz       
     if (questionsData) {
         questionsData.forEach((questionItem) => {
         const correctAnswer = questionItem.correctAnswer;
@@ -157,10 +198,12 @@ async function fetchQuiz(quizID) {
         const questionText = questionItem.question;
     
         const wrongAnswersArray = Object.values(wrongAnswersMap);
-    
+            
+        //Combine correct and incorrect answers, shuffle them
         var allAnswers = [correctAnswer, ...wrongAnswersArray];
         shuffleArray(allAnswers);
     
+        //Add question data to the array
         docQuestions.push({
             question: questionText,
             answers: allAnswers,
@@ -170,29 +213,27 @@ async function fetchQuiz(quizID) {
         });
         console.log(docQuestions);
     }
-       
+     //Return the array of processed quiz questions  
     return docQuestions;            
 }
 
-  //Position of the current question
-  let currentQuestionIndex = 0;
-  
-  //Enumerates questions in order of quiz
-  let questionNumber = 1;
 
-  //Final score for current quiz
-  let score = 0; 
+let currentQuestionIndex = 0;   //Position of the current question
+let questionNumber = 1;   //Enumerates questions in order of quiz
+let score = 0;   //Final score for current quiz
+let allQuestionlength = 0;   //length of all questions
+var ID;   //ID for current quiz
+let questions = [];   //Array with all questions
 
-  //length of all questions
-  let allQuestionlength = 0;
-
-  //ID for current quiz
-  var ID;
-
-  //Array with all questions
-  let questions = [];
-  
-  async function startQuiz(quizID) {
+/**
+* Starts a quiz by fetching quiz questions and displaying them one by one. 
+* 
+* @function startQuiz
+* @param {string} quizID - The ID of the quiz to start. 
+* @returns {void} This function displays quiz questions and manages the quiz flow asynchronously.
+* @throws {Error} If there is an error fetching or processing quiz questions.
+*/
+async function startQuiz(quizID) {
     
     let quizQuestion = await fetchQuiz(quizID);
     questionNumber = 1;
@@ -214,10 +255,17 @@ async function fetchQuiz(quizID) {
         });
     }
     showScore();
-  }
+}
   
-  // Function to display the current question
-  function showQuestion(arr){
+
+/**
+* Displays the current quiz question with answer option on the page.
+* 
+* @function showQuestion
+* @param {Object} arr - An object containing the current question and it's answer options.
+* @returns {void} This function updates the DOM to show the current questions and answer options.
+*/
+function showQuestion(arr){
     resetState();
     let currentQuestions = arr; 
     let questionNo = questionNumber++; 
@@ -236,16 +284,28 @@ async function fetchQuiz(quizID) {
 }
 
   
-  // Function to reset the quiz state
-  function resetState(){
+/**
+* Resets the state of the quiz by hiding the next button and removing all answer buttons from the DOM.
+* 
+* @function resetState
+* @returns {void} This function updates the DOM to reset the quiz state. 
+*/
+function resetState(){
     nextButton.style.display = "none"; 
     while(answerButtons.firstChild){
         answerButtons.removeChild(answerButtons.firstChild);
     }
-  }
+}
   
-  // Function to handle user's answer selection
-  function selectAnswer(e){
+ 
+/**
+* Handles the user's selection of an answer for a quiz question.
+* 
+* @function selectAnswer
+* @param {Event} e - The event object representing the click event on an answer button.
+* @returns {void} This function updates the DOM to reflect the user's answer selection and enables the next button.  
+*/
+function selectAnswer(e){
     const selectedBtn = e.target; 
     
     const isCorrect = selectedBtn.innerHTML === questions.correctAnswer; 
@@ -266,8 +326,13 @@ async function fetchQuiz(quizID) {
 }
 
   
-  // Function to display the final score
-  function showScore(){
+/**
+* Displays the final score of the quiz and allow the user to quit or return to the quiz menu.
+* 
+* @function showScore
+* @returns {void} This function updates the DOM to show the user's final score and provides options to quit or return to the quiz menu. 
+*/
+function showScore(){
     resetState(); 
     questionElem.innerHTML = `You scored ${score} out of ${allQuestionlength}!`; 
     nextButton.innerHTML = "Quit"; 
@@ -277,20 +342,55 @@ async function fetchQuiz(quizID) {
     nextButton.addEventListener("click", function() {  
         window.location.href = "quiz_menu.html";
     });
-  }
+}
   
-  // Event listener for the "Next" button
-  function handleNextButton(){
+
+/**
+* Handles the "Next" button functionality during the quiz.
+* 
+* @function handleNextButton
+* @returns {void} This function updates the current question index and checks if the quiz is complete to show the final score.
+*/
+function handleNextButton(){
     currentQuestionIndex++
     if(currentQuestionIndex > allQuestionlength){
         showScore(); 
     }
-  }
+}
   
 
+//Assigning functions to global variables for ease of access
 
+/**
+ * Function reference for fetching a quiz based on its ID.
+ * 
+ * @type {Function}
+ */
 window.fetchQuiz = fetchQuiz;
+
+/**
+ * Function reference for starting a quiz based on its ID.
+ * 
+ * @type {Function}
+ */
 window.startQuiz = startQuiz;
+
+/**
+ * Function reference for fetching all quizzes associated with the current course.
+ * 
+ * @type {Function}
+ */
 window.getAllQuizzes = getAllQuizzes;
+
+/**
+ * Function reference for for creating a new quiz.
+ * @type {Function}
+ */
 window.createQuiz = createQuiz;
+
+/**
+ * Function reference for adding questions to an existing quiz.
+ * 
+ * @type {Function}
+ */
 window.addQuizQuestions = addQuizQuestions;
