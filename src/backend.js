@@ -40,12 +40,10 @@ const firebaseApp = initializeApp(firebaseConfig);
 // Get Firestore database instance
 const db = getFirestore();
 
-export function getDB() {
-  return db;
-}
-
 // Get a reference to the storage service
 const storage = getStorage();
+
+export { storage, db };
 
 /**
  * Asynchronously retrieves the download URL for a file stored in Firebase Storage based on a given path.
