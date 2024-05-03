@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";  
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, getDoc, arrayUnion } from "firebase/firestore";
 
-import { getDB } from './backend.js';
+import { db } from './backend.js';
  
 
 // DOM elements
@@ -11,8 +11,6 @@ import { getDB } from './backend.js';
 const questionElem = document.getElementById("question");
 const answerButtons = document.getElementById("answer-buttons"); 
 const nextButton = document.getElementById("next-btn"); 
-
-const db = getDB();
 
 async function createQuiz() {
     var courseID = localStorage.getItem("ID");

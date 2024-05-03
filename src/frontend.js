@@ -1,5 +1,6 @@
-import { getDoc, doc } from 'firebase/firestore';
-import { getCourses, getFileDownloadURL, getDB } from './backend.js'
+import { getDoc, doc, setDoc } from 'firebase/firestore';
+import { getCourses, getFileDownloadURL, db, storage } from './backend.js'
+import { ref, uploadBytes } from  'firebase/storage';
 
 /**
  * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.
@@ -58,7 +59,7 @@ async function generateCourseExams() {
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(getDB(), courseID, "Exams");
+  const docRef = doc(db, courseID, "Exams");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("exams");
@@ -126,7 +127,7 @@ async function generateCourseLectures() {
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(getDB(), courseID, "Lectures");
+  const docRef = doc(db, courseID, "Lectures");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("lectures");
@@ -188,7 +189,7 @@ async function generateCourseVideos() {
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(getDB(), courseID, "Videos");
+  const docRef = doc(db, courseID, "Videos");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("videos");
@@ -357,7 +358,7 @@ async function uploadFile(collectionID, category, fileName, desc, file) {
  */
 async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3) {
   try {
-    const docRef = doc(getDB(), collectionID, documentName);
+    const docRef = doc(db, collectionID, documentName);
     await setDoc(docRef, {
       [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3]
     }, { merge: true });
