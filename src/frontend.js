@@ -1,42 +1,14 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, get, getDoc, increment } from 'firebase/firestore';
-import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage';
+import { getDoc, doc } from 'firebase/firestore';
+import { getCourses, getFileDownloadURL, getDB } from './backend.js'
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
-  authDomain: "campusconnect-30c4a.firebaseapp.com",
-  databaseURL: "https://campusconnect-30c4a-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "campusconnect-30c4a",
-  storageBucket: "campusconnect-30c4a.appspot.com",
-  messagingSenderId: "728123265116",
-  appId: "1:728123265116:web:2d24f83a222e156fe4d699",
-  measurementId: "G-YRMP4KDMNX"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-
-const db = getFirestore();
-
-const storage = getStorage();
-
-async function getFileDownloadURL(path) {
-  try {
-    const fileRef = ref(storage, path);
-    const downloadURL = await getDownloadURL(fileRef);
-    console.log("Download URL:", downloadURL);
-    return downloadURL;
-  } catch (error) {
-    console.error("Error getting download URL:", error);
-    return null;
-  }
-}
-
-async function getCourses() {
-  const snapshot = await getDocs(collection(db, "kurser"));
-  return snapshot.docs.map(doc => doc.data());
-}
-
-
+/**
+ * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.
+ * This function retrieves a list of courses from `getCourses`, then iterates through each course to dynamically create a navigational button.
+ * Each button includes an anchor link that, when clicked, stores course information in localStorage and navigates to a `lectures.html` page with related content.
+ * @async
+ * @function generateCourseNavigation
+ * @returns {Promise<void>} Does not explicitly return a value; results in side effects in the DOM and localStorage.
+ */
 async function generateCourseNavigation() {
   const courses = await getCourses();
   console.log(courses);
@@ -48,7 +20,7 @@ async function generateCourseNavigation() {
     link.addEventListener('click', () => {
       localStorage.setItem("course", course.name);
       localStorage.setItem("ID", course.ID);
-      console.log(courseID);
+      console.log(course.ID);
     });
     link.style.textDecoration = "none";
     link.style.color = "black";
@@ -67,17 +39,26 @@ async function generateCourseNavigation() {
     h5.appendChild(link);
     button.appendChild(h5);
     nav.appendChild(button);
-
     nav.style.width = "100%";
   });
 }
 
+/**
+ * Asynchronously generates and displays cards for each exam associated with a course retrieved from Firestore.
+ * The function fetches the course ID from localStorage, uses it to construct a Firestore document reference, and retrieves the document.
+ * If the document exists and contains data, it processes each field in the document (expected to be an exam-related data array),
+ * creates a card for each exam, and attaches an event listener to a button on the card that attempts to open a file URL when clicked.
+ * 
+ * @async
+ * @function generateCourseExams
+ * @returns {Promise<void>} Executes asynchronous operations and manipulates the DOM, but returns no value.
+ */
 async function generateCourseExams() {
 
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(db, courseID, "Exams");
+  const docRef = doc(getDB(), courseID, "Exams");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("exams");
@@ -128,15 +109,24 @@ async function generateCourseExams() {
     console.log("No such document!");
   }
 
-
 }
+
+/**
+ * Asynchronously generates exam cards for a specific course and appends them to a specified element in the DOM.
+ * This function retrieves a course ID from localStorage, then uses it to fetch exam data from a Firestore collection.
+ * Each exam entry is displayed in a card with a clickable button that, when clicked, attempts to open a document or file related to the exam.
+ * 
+ * @async
+ * @function generateCourseExams
+ * @returns {Promise<void>} Does not return a value but performs DOM manipulations and might open new browser tabs based on user interaction.
+ */
 
 async function generateCourseLectures() {
 
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(db, courseID, "Lectures");
+  const docRef = doc(getDB(), courseID, "Lectures");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("lectures");
@@ -216,7 +206,6 @@ async function generateCourseLectures() {
     console.log("No such document!");
   }
 
-
 }
 
 async function generateCourseVideos() {
@@ -224,7 +213,7 @@ async function generateCourseVideos() {
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
 
-  const docRef = doc(db, courseID, "Videos");
+  const docRef = doc(getDB(), courseID, "Videos");
   const docSnap = await getDoc(docRef);
   console.log(docSnap);
   const row = document.getElementById("videos");
@@ -429,7 +418,7 @@ async function uploadFile(collectionID, category, fileName, desc, file) {
  */
 async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3, fieldValue4) {
   try {
-    const docRef = doc(db, collectionID, documentName);
+    const docRef = doc(getDB(), collectionID, documentName);
     await setDoc(docRef, {
       [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3, fieldValue4]
     }, { merge: true });
@@ -472,12 +461,22 @@ async function submitFile(courseID) {
   }
 }
 
-
+// Expose submitFile function globally for usage
 window.submitFile = submitFile;
+
+// Expose generateUpload function globally for usage
 window.generateUpload = generateUpload;
+
+// Expose generateCourseVideos function globally for usage
 window.generateCourseVideos = generateCourseVideos;
+
+// Expose generateCourseLectures function globally for usage
 window.generateCourseLectures = generateCourseLectures;
+
+// Expose generateCourseExams function globally for usage
 window.generateCourseExams = generateCourseExams;
+
+// Expode generateCourseNavigation function globally for usage
 window.generateCourseNavigation = generateCourseNavigation;
 
 

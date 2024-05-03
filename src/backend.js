@@ -40,8 +40,48 @@ const firebaseApp = initializeApp(firebaseConfig);
 // Get Firestore database instance
 const db = getFirestore();
 
+export function getDB() {
+  return db;
+}
+
 // Get a reference to the storage service
 const storage = getStorage();
+
+/**
+ * Asynchronously retrieves the download URL for a file stored in Firebase Storage based on a given path.
+ * This function creates a reference to a storage location using the provided path, attempts to get the download URL,
+ * and logs the URL or an error if the operation fails.
+ *
+ * @async
+ * @function getFileDownloadURL
+ * @param {string} path - The path in Firebase Storage from which to retrieve the file's download URL.
+ * @returns {Promise<string|null>} The download URL of the file if successful, otherwise null.
+ */
+export async function getFileDownloadURL(path) {
+  try {
+    const fileRef = ref(storage, path);
+    const downloadURL = await getDownloadURL(fileRef);
+    console.log("Download URL:", downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error("Error getting download URL:", error);
+    return null;
+  }
+}
+
+/**
+ * Asynchronously retrieves all courses from a Firestore collection named "kurser".
+ * The function queries the Firestore collection, extracts data from each document,
+ * and returns it as an array of objects, each representing a course.
+ * 
+ * @async
+ * @function getCourses
+ * @returns {Promise<Array<Object>>} An array of objects, each representing a course, extracted from Firestore documents.
+ */
+export async function getCourses() {
+  const snapshot = await getDocs(collection(db, "kurser"));
+  return snapshot.docs.map(doc => doc.data());
+}
 
 /**
  * Creates a new reference to the specified tenta.
@@ -68,28 +108,48 @@ async function getFileRef(courseID, category, fileName) {
 }
 
 /**
- * Creates a new downloadURL to the specified file.
+ * Uploads a file and creates a firestore reference.
  * @async
  * @function
- * @param {string} path - The path of the file in our storage.
- * @returns {Object|null} - A Promise that resolves with the download URL for this object,
- * or null if the file does not exist or an error occurs.
+ * @param {string} collectionID - The collection ID.
+ * @param {string} category - The type of file.
+ * @param {string} fileName - File name, included ."type" (Example: .PDF).
+ * @param {string} desc - The file description.
+ * @param {File} file - The file object selected by the user.
  */
-async function getFileDownloadURL(path) {
+async function uploadFile(collectionID, category, fileName, desc, file) {
   try {
-    const fileRef = ref(storage, path);
-    const downloadURL = await getDownloadURL(fileRef);
-    console.log("Download URL:", downloadURL);
-    return downloadURL;
+    const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
+    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc);
+    await uploadBytes(storageRef, file).then((snapshot) => {
+      console.log("Uploaded file succesfully");
+    });
   } catch (error) {
-    console.error("Error getting download URL:", error);
-    return null;
+    console.error("Error uploading file:", error);
   }
 }
 
-
-
-
+/**
+ * Adds an array field with information inside a given document in a given collection.
+ * @async
+ * @function
+ * @param {string} collectionID - The collection ID.
+ * @param {string} documentName - The document name.
+ * @param {string} fieldValue1 - Array index 0 value.
+ * @param {string} fieldValue2 - Array index 1 value.
+ * @param {string} fieldValue3 - Array index 2 value.
+ */
+async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3) {
+  try {
+    const docRef = doc(db, collectionID, documentName);
+    await setDoc(docRef, {
+      [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3]
+    }, { merge: true });
+    console.log("Array field added/updated successfully");
+  } catch (error) {
+    console.error("Error adding array field:", error);
+  }
+}
 
 /**
  * Creates a new folder and subfolders for a course.
@@ -203,3 +263,5 @@ window.getFileDownloadURL = getFileDownloadURL;
 // Expose storageCreateCourse function globally for usage
 window.storageCreateCourse = storageCreateCourse;
 
+// Expose uploadFile function globally for usage
+window.uploadFile = uploadFile;
