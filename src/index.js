@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, get, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, get, getDoc, increment } from 'firebase/firestore';
 import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -30,7 +30,6 @@ async function getFileDownloadURL(path) {
     return null;
   }
 }
-
 
 async function getCourses() {
   const snapshot = await getDocs(collection(db, "kurser"));
@@ -179,9 +178,34 @@ async function generateCourseLectures() {
           }
         });
 
+
+        const heart = document.createElement("p");
+        heart.classList.add("btn", "shadow-none");
+        heart.textContent = "🖤" + arrayField[3];
+        heart.style.fontSize = "2rem";
+
+        heart.addEventListener('click', async () => {
+          try {
+            const count = await getLikeCount("Lectures", arrayField[0]);
+            if (heart.textContent == "🖤" + count) {
+
+              await addArrayFieldToDocument(courseID, "Lectures", arrayField[0], arrayField[1], arrayField[2], count + 1);
+              heart.textContent = "❤" + await getLikeCount("Lectures", arrayField[0]);
+
+            }
+            else {
+              await addArrayFieldToDocument(courseID, "Lectures", arrayField[0], arrayField[1], arrayField[2], count - 1);
+              heart.textContent = "🖤" + await getLikeCount("Lectures", arrayField[0]);
+            }
+          } catch (error) {
+            console.error("error", error);
+          }
+        });
+
         card_body.appendChild(name);
         card_body.appendChild(desc);
         card_body.appendChild(button);
+        card_body.appendChild(heart);
         card_container.appendChild(card_body);
         row.appendChild(card_container);
 
@@ -230,6 +254,41 @@ async function generateCourseVideos() {
 
         row.appendChild(iframe);
 
+      }
+    }
+  } else {
+    console.log("No such document!");
+  }
+}
+
+/**
+* Uploads a file and creates a firestore reference.
+* @async
+* @function
+* @param {string} document - The course document to enter
+* @param {string} name - Name of the wanted field 
+*/
+async function getLikeCount(document, name) {
+
+  var courseID = localStorage.getItem("ID");
+  console.log(courseID);
+
+  const docRef = doc(db, courseID, document);
+  const docSnap = await getDoc(docRef);
+  console.log(docSnap);
+
+  if (docSnap) {
+    const data = docSnap.data();
+    if (data) {
+      // Iterate over each field in the document's data
+      for (const fieldName in data) {
+
+        if (fieldName == name) {
+          const arrayField = data[fieldName];
+          console.log(arrayField[0]);
+          console.log(arrayField[3]);
+          return arrayField[3];
+        }
       }
     }
   } else {
@@ -348,7 +407,7 @@ async function generateUpload() {
 async function uploadFile(collectionID, category, fileName, desc, file) {
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
-    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc);
+    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc, 0);
     await uploadBytes(storageRef, file).then((snapshot) => {
       console.log("Uploaded file succesfully");
     });
@@ -366,12 +425,13 @@ async function uploadFile(collectionID, category, fileName, desc, file) {
  * @param {string} fieldValue1 - Array index 0 value.
  * @param {string} fieldValue2 - Array index 1 value.
  * @param {string} fieldValue3 - Array index 2 value.
+ * @param {string} fieldValue4 - Array index 3 value.
  */
-async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3) {
+async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3, fieldValue4) {
   try {
     const docRef = doc(db, collectionID, documentName);
     await setDoc(docRef, {
-      [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3]
+      [fieldValue1]: [fieldValue1, fieldValue2, fieldValue3, fieldValue4]
     }, { merge: true });
     console.log("Array field added/updated successfully");
   } catch (error) {
