@@ -1,16 +1,16 @@
 import { initializeApp } from "firebase/app";  
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, getDoc, arrayUnion } from "firebase/firestore";
 
-import { getDB } from './backend.js';
+import { db } from './backend.js';
  
 
-// DOM elements 
-const questionElem = document.getElementById("question");  //Representing the question display area
-const answerButtons = document.getElementById("answer-buttons");   //Representing the answer buttons container
-const nextButton = document.getElementById("next-btn");  //Representing the next button 
+// DOM elements
 
-//Get access to the database
-const db = getDB();
+//TODO: Documentation
+
+const questionElem = document.getElementById("question");
+const answerButtons = document.getElementById("answer-buttons"); 
+const nextButton = document.getElementById("next-btn"); 
 
 
 /**
