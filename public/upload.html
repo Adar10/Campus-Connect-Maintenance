@@ -25,7 +25,7 @@
 
 </head>
 
-<style>
+<style>  
   .navbar .navbar-nav .nav-link:hover {
     background-color: gray;
     color: black;
@@ -304,83 +304,106 @@
 
   <script>
     function createoncefunction() {
-      let hasbeencalled = false;
-      return function () {
-        if (!hasbeencalled) {
-          signOutWithGoogle();
-          var myVariable = "false";
-          localStorage.setItem("myVariable", myVariable);
-          hasbeencalled = true;
+        let hasbeencalled = false;
+        return function () {
+            if (!hasbeencalled) {
+                signOutWithGoogle();
+                var myVariable = "false";
+                localStorage.setItem("myVariable", myVariable);
+                hasbeencalled = true;
+            }
         }
-      }
     }
 
     const state = createoncefunction();
 
     function set_name() {
-      var status = localStorage.getItem("myVariable");
-      if (status === "false") {
-        document.getElementById("login_status").innerHTML = "Login"
-      }
-      else {
-        document.getElementById("login_status").innerHTML = "Logout"
-      }
+        var status = localStorage.getItem("myVariable");
+        if (status === "false") {
+            document.getElementById("login_status").innerHTML = "Login"
+        }
+        else {
+            document.getElementById("login_status").innerHTML = "Logout"
+        }
 
     }
 
     function google_event() {
-      var status = localStorage.getItem("myVariable");
-      if (status === "false") {
-        event_login();
-        document.getElementById("login_status").innerHTML = "Logout"
+        var status = localStorage.getItem("myVariable");
+        if (status === "false") {
+            event_login();
 
-      }
-      else {
-        event_logout();
-        document.getElementById("login_status").innerHTML = "Login"
+        }
+        else {
+            event_logout();
 
-      }
+        }
     }
 
     function event_login() {
-      change();
-      signInWithGoogle();
-      return;
+        signInWithGoogle();
+        return;
     }
 
     function event_logout() {
-      change();
-      signOutWithGoogle();
-      return;
+        change();
+        signOutWithGoogle();
+        return;
     }
 
     function change() {
-      var myVariable = localStorage.getItem("myVariable");
-      if (myVariable === "false") {
-        myVariable = "true";
-      }
-      else {
-        myVariable = "false";
-      }
-      localStorage.setItem("myVariable", myVariable);
+        var myVariable = localStorage.getItem("myVariable");
+        if (myVariable === "false") {
+            myVariable = "true";
+        }
+        else {
+            myVariable = "false";
+        }
+        localStorage.setItem("myVariable", myVariable);
     }
 
-    function signInWithGoogle() {
-      var provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider).then(function (result) {
-        var user = result.user;
-        console.log("Signed in", user)
-      }).catch(function (error) {
-        console.error(error);
-      });
-    }
+    function disableLoginButton() {
+            var btn = document.getElementById('login_status');
+            btn.onclick = function(event) {
+                event.preventDefault();
+            }
+            btn.innerHTML = "Waiting for response...";
+        }
+
+        function enableLoginButton() {
+            var btn = document.getElementById('login_status');
+            btn.setAttribute("href", "#");
+            btn.onclick = google_event;
+            btn.innerHTML = "Login";
+        }
+
+        function signInWithGoogle() {
+            var provider = new firebase.auth.GoogleAuthProvider();
+            
+            disableLoginButton();
+            
+            firebase.auth().signInWithPopup(provider).then(function (result) {
+                var user = result.user;
+                console.log("Signed in", user);
+                enableLoginButton();
+                document.getElementById("login_status").innerHTML = "Logout";
+                change();
+
+            }).catch(function (error) {
+                console.error(error);
+                enableLoginButton();
+                
+                document.getElementById("login_status").innerHTML = "Login";
+            });
+        }
 
     function signOutWithGoogle() {
-      firebase.auth().signOut().then(() => {
-        console.log("Signed out");
-      }).catch((error) => {
-        console.error(error);
-      });
+        firebase.auth().signOut().then(() => {
+            console.log("Signed out");
+            document.getElementById("login_status").innerHTML = "Login"
+        }).catch((error) => {
+            console.error(error);
+        });
     }
 
     //document.getElementById('googleSignInButton').addEventListener('click', event_login);
@@ -388,11 +411,12 @@
     //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
     firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        console.log("User is signed in");
-      } else {
-        console.log("User is signed out");
-      }
+        if (user) {
+            console.log("User is signed in");
+        } else {
+            console.log("User is signed out");
+            window.location.href = "upload_login.html";
+        }
     })
   </script>
 
