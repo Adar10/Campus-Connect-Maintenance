@@ -140,7 +140,7 @@
             width: 200px;
             height: 50px;
             margin: 10px auto;
-            background-color: #000000; 
+            background-color: #0d6efd; 
             color: whitesmoke; 
             text-align: center; 
             font-size: 18px;
@@ -229,6 +229,8 @@
     <div class="container mt-5">
         <p class="text-center text-white" style="font-size: 30px;">Time to revise? Choose a quiz or create your own!</p>
         <button id="add-quiz-btn" class="btn btn-primary">Add a Quiz</button>
+        <div id="error-message-add" style="color: red; position: fixed; top: 50%; left: 50%; margin-top: -80px; margin-left: 150px; width: 100px; height: 100px;"></div>
+ 
       </div>
 
 <!--Quiz Popup Modal -->
@@ -272,10 +274,20 @@
     $(document).ready(function() {
     // Add click event listener to the "Add Quiz" button
     $('#add-quiz-btn').click(function() {
-      $('#addQuizModal').modal('show');
-      $('#quiz-name').show();
-      $('#submit-name-btn').show();
-      $('#questions-container').hide(); 
+        var myVariable = localStorage.getItem("myVariable");
+        var errorMessageAdd = document.getElementById("error-message-add");
+        console.log(myVariable);
+        if(myVariable === "true") {
+            errorMessageAdd.style.display = "none";
+            $('#addQuizModal').modal('show');
+            $('#quiz-name').show();
+            $('#submit-name-btn').show();
+            $('#questions-container').hide(); 
+        } else {
+            errorMessageAdd.style.display = "block";
+            errorMessageAdd.textContent = "Need to sign in to add quiz questions.";
+        }
+        
     });
     
     // Add click event listener to the "Submit Name" button
