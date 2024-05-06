@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <title>Document</title>
     <script src="bundle.js"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3314334557831025"
+        crossorigin="anonymous"></script>
 
 
 
@@ -256,7 +258,7 @@
 
         function disableLoginButton() {
             var btn = document.getElementById('login_status');
-            btn.onclick = function(event) {
+            btn.onclick = function (event) {
                 event.preventDefault();
             }
             btn.innerHTML = "Waiting for response...";
@@ -271,7 +273,7 @@
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
-            
+
             disableLoginButton();
 
             firebase.auth().signInWithPopup(provider).then(function (result) {
@@ -284,8 +286,8 @@
             }).catch(function (error) {
                 console.error(error);
                 enableLoginButton();
-                
-                document.getElementById("login_status").innerHTML = "Login";                
+
+                document.getElementById("login_status").innerHTML = "Login";
             });
         }
 
@@ -301,7 +303,7 @@
         //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
         //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
-        
+
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 console.log("User is signed in");

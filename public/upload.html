@@ -25,7 +25,7 @@
 
 </head>
 
-<style>  
+<style>
   .navbar .navbar-nav .nav-link:hover {
     background-color: gray;
     color: black;
@@ -94,7 +94,7 @@
     /* Hidden by default */
     position: fixed;
     /* Stay in place */
-    z-index: 2;
+    z-index: 5;
     /* Sit on top */
     padding-top: 100px;
     /* Location of the box */
@@ -108,7 +108,7 @@
     /* Enable scroll if needed */
     background-color: rgb(0, 0, 0);
     /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0);
     /* Black w/ opacity */
   }
 
@@ -136,10 +136,22 @@
     cursor: pointer;
   }
 
+  .alert {
+    width: 75%;
+    margin-left: 12.5%;
+    text-align: center;
+    z-index: 6;
+    position: fixed;
+    overflow: auto;
+  }
+
+
+
   /*END OF MODAL CSS*/
 </style>
 
 <body class="bg-info" onload="set_name()">
+
 
 
   <!-- Start of navbar-->
@@ -187,17 +199,10 @@
     <h1 id="coursename">Upload to our database</h1>
   </div>
 
-  <!-- THIS CODE IS NO LONGER NEEDED
+  <div class="alert alert-success alert-dismissible fade show" style="display: none;" role="alert" id="alert">
+    <strong>Upload successful!</strong>
+  </div>
 
-  <script type="text/javascript">
-    //localStorage.setItem("highScore","564544");
-    var courseName = localStorage.getItem("course");
-    // Considering you already have highScore set in local storage.
-    // Uncomment your line number 10 if you want to set in local storage
-    document.getElementById('coursename').innerHTML = "Upload to our database";
-  </script>
-  -->
-  <!--End of header-->
 
   <div class="container mt-5 bg-info" style="margin-bottom: 5rem;">
     <h2>Search for courses</h2>
@@ -231,36 +236,6 @@
     });
   </script>
 
-
-  <!-- 
-  <div class="container mt-5" style="margin-bottom: 5rem;">
-    <div class="row" id="mycard">
-
-
-      <div class="card container mt-5" style="width: 20rem;">
-        <div class="card-body">
-          <h5 class="card-title">Sannolikhet och statistik</h5>
-          <input class="form-control" id="formFileLg" type="file">
-          <input class="form-control" id="fileName" type="text" placeholder="Name of file">
-          <input class="form-control" id="fileDesc" type="text" placeholder="Description of file">
-          <div class="input-group">
-            <select class="custom-select" id="inputGroupSelect04" style="flex: 1;">
-              <option selected>Choose type of data</option>
-              <option value="1">Lectures</option>
-              <option value="2">Videos</option>
-              <option value="3">Quizzes</option>
-              <option value="4">Exams</option>
-            </select>
-            <div class="input-group-append">
-              <button class="btn btn-primary " type="button" onclick="">Submit</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
--->
-
   <div class="container mt-5" style="margin-bottom: 5rem;">
     <div id="mycard">
       <div class="row" id="upload">
@@ -271,8 +246,8 @@
   </div>
 
 
+
   <script>
-    // Call your function here
     document.addEventListener("DOMContentLoaded", function () {
       try {
         console.log("Generating upload");
@@ -282,6 +257,7 @@
       }
 
     });
+
   </script>
 
 
@@ -304,106 +280,106 @@
 
   <script>
     function createoncefunction() {
-        let hasbeencalled = false;
-        return function () {
-            if (!hasbeencalled) {
-                signOutWithGoogle();
-                var myVariable = "false";
-                localStorage.setItem("myVariable", myVariable);
-                hasbeencalled = true;
-            }
+      let hasbeencalled = false;
+      return function () {
+        if (!hasbeencalled) {
+          signOutWithGoogle();
+          var myVariable = "false";
+          localStorage.setItem("myVariable", myVariable);
+          hasbeencalled = true;
         }
+      }
     }
 
     const state = createoncefunction();
 
     function set_name() {
-        var status = localStorage.getItem("myVariable");
-        if (status === "false") {
-            document.getElementById("login_status").innerHTML = "Login"
-        }
-        else {
-            document.getElementById("login_status").innerHTML = "Logout"
-        }
+      var status = localStorage.getItem("myVariable");
+      if (status === "false") {
+        document.getElementById("login_status").innerHTML = "Login"
+      }
+      else {
+        document.getElementById("login_status").innerHTML = "Logout"
+      }
 
     }
 
     function google_event() {
-        var status = localStorage.getItem("myVariable");
-        if (status === "false") {
-            event_login();
+      var status = localStorage.getItem("myVariable");
+      if (status === "false") {
+        event_login();
 
-        }
-        else {
-            event_logout();
+      }
+      else {
+        event_logout();
 
-        }
+      }
     }
 
     function event_login() {
-        signInWithGoogle();
-        return;
+      signInWithGoogle();
+      return;
     }
 
     function event_logout() {
-        change();
-        signOutWithGoogle();
-        return;
+      change();
+      signOutWithGoogle();
+      return;
     }
 
     function change() {
-        var myVariable = localStorage.getItem("myVariable");
-        if (myVariable === "false") {
-            myVariable = "true";
-        }
-        else {
-            myVariable = "false";
-        }
-        localStorage.setItem("myVariable", myVariable);
+      var myVariable = localStorage.getItem("myVariable");
+      if (myVariable === "false") {
+        myVariable = "true";
+      }
+      else {
+        myVariable = "false";
+      }
+      localStorage.setItem("myVariable", myVariable);
     }
 
     function disableLoginButton() {
-            var btn = document.getElementById('login_status');
-            btn.onclick = function(event) {
-                event.preventDefault();
-            }
-            btn.innerHTML = "Waiting for response...";
-        }
+      var btn = document.getElementById('login_status');
+      btn.onclick = function (event) {
+        event.preventDefault();
+      }
+      btn.innerHTML = "Waiting for response...";
+    }
 
-        function enableLoginButton() {
-            var btn = document.getElementById('login_status');
-            btn.setAttribute("href", "#");
-            btn.onclick = google_event;
-            btn.innerHTML = "Login";
-        }
+    function enableLoginButton() {
+      var btn = document.getElementById('login_status');
+      btn.setAttribute("href", "#");
+      btn.onclick = google_event;
+      btn.innerHTML = "Login";
+    }
 
-        function signInWithGoogle() {
-            var provider = new firebase.auth.GoogleAuthProvider();
-            
-            disableLoginButton();
-            
-            firebase.auth().signInWithPopup(provider).then(function (result) {
-                var user = result.user;
-                console.log("Signed in", user);
-                enableLoginButton();
-                document.getElementById("login_status").innerHTML = "Logout";
-                change();
+    function signInWithGoogle() {
+      var provider = new firebase.auth.GoogleAuthProvider();
 
-            }).catch(function (error) {
-                console.error(error);
-                enableLoginButton();
-                
-                document.getElementById("login_status").innerHTML = "Login";
-            });
-        }
+      disableLoginButton();
+
+      firebase.auth().signInWithPopup(provider).then(function (result) {
+        var user = result.user;
+        console.log("Signed in", user);
+        enableLoginButton();
+        document.getElementById("login_status").innerHTML = "Logout";
+        change();
+
+      }).catch(function (error) {
+        console.error(error);
+        enableLoginButton();
+
+        document.getElementById("login_status").innerHTML = "Login";
+      });
+    }
 
     function signOutWithGoogle() {
-        firebase.auth().signOut().then(() => {
-            console.log("Signed out");
-            document.getElementById("login_status").innerHTML = "Login"
-        }).catch((error) => {
-            console.error(error);
-        });
+      firebase.auth().signOut().then(() => {
+        console.log("Signed out");
+        document.getElementById("login_status").innerHTML = "Login"
+      }).catch((error) => {
+        console.error(error);
+      });
     }
 
     //document.getElementById('googleSignInButton').addEventListener('click', event_login);
@@ -411,12 +387,12 @@
     //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
     firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            console.log("User is signed in");
-        } else {
-            console.log("User is signed out");
-            window.location.href = "upload_login.html";
-        }
+      if (user) {
+        console.log("User is signed in");
+      } else {
+        console.log("User is signed out");
+        window.location.href = "upload_login.html";
+      }
     })
   </script>
 
