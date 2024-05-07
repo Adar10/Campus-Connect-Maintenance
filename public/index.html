@@ -86,7 +86,7 @@
     }
 </style>
 
-<body class="bg-info" onload="set_name()">
+<body class="bg-info-subtle" onload="set_name()">
 
 
     <!-- Start of navbar-->
@@ -128,7 +128,7 @@
 
     <!--Start of header-->
 
-    <div class="container-fluid p-5 bg-info text-black text-center">
+    <div class="container-fluid p-5 bg-info-subtle text-black text-center">
         <h1>Campus Connect</h1>
         <p>Welcome to our free to use study website</p>
     </div>
@@ -160,9 +160,9 @@
 
 
 
-    <div class="container mt-5 bg-info" style="margin-bottom: 5rem;">
+    <div class="container mt-5 bg-info-subtle" style="margin-bottom: 5rem;">
         <h2>Search for courses</h2>
-        <input type="text" id="filter" onkeyup="myFunction()" placeholder="Course name..">
+        <input class="border, border-dark" type="text" id="filter" onkeyup="myFunction()" placeholder="Course name..">
         <div class="row text-center" id="mycard">
             <div id="navigation">
 
@@ -256,7 +256,7 @@
 
         function disableLoginButton() {
             var btn = document.getElementById('login_status');
-            btn.onclick = function(event) {
+            btn.onclick = function (event) {
                 event.preventDefault();
             }
             btn.innerHTML = "Waiting for response...";
@@ -271,7 +271,7 @@
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
-            
+
             disableLoginButton();
 
             firebase.auth().signInWithPopup(provider).then(function (result) {
@@ -284,8 +284,8 @@
             }).catch(function (error) {
                 console.error(error);
                 enableLoginButton();
-                
-                document.getElementById("login_status").innerHTML = "Login";                
+
+                document.getElementById("login_status").innerHTML = "Login";
             });
         }
 
@@ -301,7 +301,7 @@
         //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
         //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
-        
+
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 console.log("User is signed in");

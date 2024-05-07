@@ -139,7 +139,7 @@
     /*END OF MODAL CSS*/
 </style>
 
-<body class="bg-info" onload="set_name()">
+<body class="bg-info-subtle" onload="set_name()">
 
 
     <!-- Start of navbar-->
@@ -194,7 +194,7 @@
 
     <!--Start of header-->
 
-    <div class="container-fluid p-5 bg-info text-black text-center">
+    <div class="container-fluid p-5 bg-info-subtle text-black text-center">
         <h1>Account page</h1>
         <p>Here you will be able to see your account</p>
     </div>
@@ -288,7 +288,7 @@
 
         function disableLoginButton() {
             var btn = document.getElementById('login_status');
-            btn.onclick = function(event) {
+            btn.onclick = function (event) {
                 event.preventDefault();
             }
             btn.innerHTML = "Waiting for response...";
@@ -303,9 +303,9 @@
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
-            
+
             disableLoginButton();
-            
+
             firebase.auth().signInWithPopup(provider).then(function (result) {
                 var user = result.user;
                 console.log("Signed in", user);
@@ -315,7 +315,7 @@
             }).catch(function (error) {
                 console.error(error);
                 enableLoginButton();
-    
+
                 document.getElementById("login_status").innerHTML = "Login";
             });
         }
@@ -353,7 +353,7 @@
         <!-- Footer -->
         <footer class="text-center text-lg-start text-white" style="background-color: #1c2331">
             <!-- Section: Social media -->
-            <section class="d-flex justify-content-between p-4 bg-primary">
+            <section class="d-flex justify-content-between p-4 bg-secondary">
                 <!-- Left -->
                 <div class="me-5">
                     <span>Connect with us on social media:</span>
