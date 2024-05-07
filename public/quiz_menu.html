@@ -81,20 +81,83 @@
             /* Add a hover effect to all links, except for headers */
         }
 
+        .modal-body {
+            padding: 20px; /* Add padding to the modal body */
+            background-color: #f9f9f9; /* Light gray background color */
+            border-radius: 10px; /* Rounded corners */
+        }
+
+        /* Style the input field */
+        .modal-body input[type="text"] {
+            width: 100%; /* Full width for the input field */
+            padding: 10px; /* Padding for the input field */
+            margin-bottom: 10px; /* Margin below the input field */
+            border: 1px solid #ccc; /* Border color for the input field */
+            border-radius: 5px; /* Rounded corners for the input field */
+            box-sizing: border-box; /* Include padding and border in width calculation */
+        }
+
+        /* Style the buttons */
+        .modal-body .btn {
+            margin-right: 10px; /* Margin between buttons */
+            border-radius: 5px; /* Rounded corners for buttons */
+            padding: 8px 16px; /* Padding for buttons */
+        }
+
+        /* Style the confirmation message */
+        .modal-body #confirmation-message {
+            color: rgb(80, 162, 92); /* Green color for the confirmation message */
+            position: absolute; /* Position the confirmation message */
+            bottom: 0; /* Align to the bottom */
+            right: 0; /* Align to the right */
+        }
+
+        /* Responsive styling for smaller screens */
+        @media (max-width: 768px) {
+                .modal-body input[type="text"] {
+                width: calc(100% - 20px); /* Adjust width for smaller screens */
+            }
+        }
+  
         .quizOption-button {
         display: block;
         width: 200px;
         height: 50px;
         margin: 10px auto;
         background-color: #0c0047; 
-        color: white; 
+        color: whitesmoke; 
         text-align: center; 
         font-size: 18px;
         cursor: pointer;
         }
 
         .quizOption-button:hover {
-            background-color: #79cd7d; 
+            background-color: #c6c6c6; 
+        }
+
+        #add-quiz-btn {
+            display: block;
+            width: 200px;
+            height: 50px;
+            margin: 10px auto;
+            background-color: #0d6efd; 
+            color: whitesmoke; 
+            text-align: center; 
+            font-size: 18px;
+            cursor: pointer; 
+        }
+
+        #add-quiz-btn:hover {
+        background-color: #2980b9;
+        }   
+
+        .alert {
+            width: 75%;
+            margin-left: 12.5%;
+            text-align: center;
+            z-index: 6;
+            position: fixed;
+            overflow: auto;
         }
 
     </style>
@@ -135,15 +198,28 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="google_event()" id="login_status"></a>
+                    
                 </li>
             </ul>
+            
         </div>
     </nav>
     
-    <div class="container-fluid p-5 bg-info text-white text-center">
+    <div class="container-fluid p-5 bg-info text-white text-center" >
         <h1 id="coursename">Quizzes</h1>
     </div>
     <!--End of header-->
+
+    <div class="alert alert-success" role="alert" id="alert-loggedin" style="display: none;">
+        <strong>Logged in successfully!</strong>
+    </div>
+    <div class="alert alert-danger" role="alert" id="alert-failed" style="display: none;">
+        <strong>Failed to login!</strong>
+    </div>
+    <div class="alert alert-success" role="alert" id="alert-loggedout" style="display: none;">
+        <strong>Logged out successfully!</strong>
+    </div>
+ 
 
     <script type="text/javascript">
         var courseName = localStorage.getItem("course");
@@ -173,8 +249,10 @@
     </div>
 
     <div class="container mt-5">
-        <p class="text-center text-white" style="font-size: 46px;">Choose a Quiz</p>
+        <p class="text-center text-white" style="font-size: 30px;">Time to revise? Choose a quiz or create your own!</p>
         <button id="add-quiz-btn" class="btn btn-primary">Add a Quiz</button>
+        <div id="error-message-add" style="color: red; position: fixed; top: 50%; left: 50%; margin-top: -80px; margin-left: 150px; width: 100px; height: 100px;"></div>
+ 
       </div>
 
 <!--Quiz Popup Modal -->
@@ -182,18 +260,15 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-            <div id="error-message" style="color: red;"></div>  
+            <div id="error-message" style="color: red; position: absolute; bottom: 0; left: 0;"></div>  
           <h5 class="modal-title" id="addQuizModalLabel">Add a Quiz</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
         </div>
         <div class="modal-body">
           <input type="text" id="quiz-name" placeholder="Name of quiz"><br>
-          <div id="confirmation-message" style="color: rgb(80, 162, 92); position: absolute; top: 0; right: 0;"></div> 
+          <div id="confirmation-message" style="color: rgb(80, 162, 92);"></div> 
           <button id="submit-name-btn" class="btn btn-primary btn-sm">Submit Name</button>
           <div id="questions-container" style="display: none;">
-            <button id="add-question-btn" class="btn btn-primary btn-sm">Add a Question</button>
+            <button id="add-question-btn" class="btn btn-primary btn-sm">Click to add question</button>
           </div>
         </div>
         <div class="modal-footer">
@@ -218,32 +293,48 @@
 
   
   <script>
+    $(document).ready(function() {
+    // Add click event listener to the "Add Quiz" button
     $('#add-quiz-btn').click(function() {
-      $('#addQuizModal').modal('show');
-      $('#quiz-name').show();
-      $('#submit-name-btn').show();
-      $('#questions-container').hide(); 
+        var myVariable = localStorage.getItem("myVariable");
+        var errorMessageAdd = document.getElementById("error-message-add");
+        console.log(myVariable);
+        if(myVariable === "true") {
+            errorMessageAdd.style.display = "none";
+            $('#addQuizModal').modal('show');
+            $('#quiz-name').show();
+            $('#submit-name-btn').show();
+            $('#questions-container').hide(); 
+        } else {
+            errorMessageAdd.style.display = "block";
+            errorMessageAdd.textContent = "Need to sign in to add quiz questions.";
+        }
+        
     });
     
+    // Add click event listener to the "Submit Name" button
     $('#submit-name-btn').click(function() {
-        createQuiz();
+      createQuiz();
     });
     
+    // Add click event listener to the "Add a Question" button
     $('#add-question-btn').click(function() {
-    if ($('.question-inputs').length === 0) {
-    var questionInputs = $($('#question-template').html());
+      if ($('.question-inputs').length === 0) {
+        var questionInputs = $($('#question-template').html());
 
-    $('#questions-container').append(questionInputs);
-    }
+        $('#questions-container').append(questionInputs);
+        
+        // Hide the "Add a Question" button after adding a question
+        $(this).hide(); 
+      }
     });
     
+    // Add click event listener to the "Save Quiz" button
     $('#save-quiz-btn').click(function() {
       $('#addQuizModal').modal('hide');
     });
-  </script>
-  
-  
-    
+    });
+  </script> 
 
     <div class="container mt-5" style="margin-bottom: 5rem;">
         <div class="row" id="quizzes">
@@ -315,6 +406,7 @@
             var status = localStorage.getItem("myVariable");
             if (status === "false") {
                 event_login();
+                
 
             }
             else {
@@ -360,6 +452,37 @@
             btn.innerHTML = "Login";
         }
 
+        function loginSuccess() {
+            var loginMessage = document.getElementById("alert-loggedin");
+            
+
+                loginMessage.style.display = "block";
+                setTimeout(function() {
+                    loginMessage.style.display = "none";
+                }, 2800);
+        }
+
+        function loginFailed() {
+             var loginMessage = document.getElementById("alert-failed");
+                
+            loginMessage.style.display = "block";
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
+
+        function loggedOut() {
+             var loginMessage = document.getElementById("alert-loggedout");
+                
+            loginMessage.style.display = "block";
+            
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
+            
+        
+
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
             
@@ -369,12 +492,17 @@
                 var user = result.user;
                 console.log("Signed in", user);
                 enableLoginButton();
+
+                loginSuccess();
+
                 document.getElementById("login_status").innerHTML = "Logout";
                 change();
 
             }).catch(function (error) {
                 console.error(error);
+                loginFailed();
                 enableLoginButton();
+                
                 
                 document.getElementById("login_status").innerHTML = "Login";
             });
@@ -383,6 +511,7 @@
         function signOutWithGoogle() {
             firebase.auth().signOut().then(() => {
                 console.log("Signed out");
+                loggedOut();
                 document.getElementById("login_status").innerHTML = "Login"
             }).catch((error) => {
                 console.error(error);
@@ -396,6 +525,7 @@
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 console.log("User is signed in");
+               
             } else {
                 console.log("User is signed out");
             }

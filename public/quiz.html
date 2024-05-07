@@ -31,14 +31,13 @@
     <a href="quiz_menu.html" id="back-arrow">&larr;</a>
 
     <div class="app">
-        <h1>Quiz subject</h1>
         <div class="quiz">
             <h2 id="question">Question goes here</h2>
             <div id="answer-buttons">
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
-                <button class="btn"></button>
+                <button class="btn">A1</button>
+                <button class="btn">A2</button>
+                <button class="btn">A3</button>
+                <button class="btn">A4</button>
             </div>
             <button id="next-btn">Next</button>
             <button id="quit-btn" style="display: none;">Quit</button>
@@ -53,9 +52,6 @@
             const selectedQuizID = localStorage.getItem("selectedQuizID");
             
             startQuiz(selectedQuizID);
-               
-            localStorage.removeItem("selectedQuizID");
-            
         });
         
         document.getElementById("add-quiz-btn").addEventListener("click", function() {
