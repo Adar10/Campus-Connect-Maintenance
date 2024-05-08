@@ -313,7 +313,8 @@ async function generateUpload() {
   const courses = await getCourses();
   const div_start = document.getElementById("upload");
 
-  courses.forEach(course => {
+  courses.forEach((course, index) => {
+    
     const card_container = document.createElement("div");
     card_container.classList.add("card", "container", "mt-5")
     card_container.style.width = "20rem";
@@ -326,13 +327,13 @@ async function generateUpload() {
 
     const file = document.createElement("input");
     file.classList.add("form-control");
-    file.id = "formFileLg";
+    file.id = "formFileLg" + index;
     file.type = "file";
     file.style.visibility = "hidden";
 
     const fileName = document.createElement("input");
     fileName.classList.add("form-control");
-    fileName.id = "fileName";
+    fileName.id = "fileName" + index;
     fileName.type = "text";
     fileName.placeholder = "Name of file";
     fileName.style.visibility = "hidden";
@@ -340,7 +341,7 @@ async function generateUpload() {
 
     const fileDesc = document.createElement("input");
     fileDesc.classList.add("form-control");
-    fileDesc.id = "fileDesc";
+    fileDesc.id = "fileDesc" + index;
     fileDesc.type = "text"
     fileDesc.placeholder = "Description of file";
     fileDesc.style.visibility = "hidden";
@@ -348,7 +349,7 @@ async function generateUpload() {
 
     const videoUrl = document.createElement("input");
     videoUrl.classList.add("form-control");
-    videoUrl.id = "videoUrl";
+    videoUrl.id = "videoUrl" + index;
     videoUrl.type = "text";
     videoUrl.placeholder = "Embedded video link"
     videoUrl.style.visibility = "hidden";
@@ -359,7 +360,7 @@ async function generateUpload() {
 
     const select = document.createElement("select");
     select.classList.add("custom-select");
-    select.id = "inputGroupSelect04";
+    select.id = "inputGroupSelect04" + index;
     select.style.flex = "1";
 
 
@@ -388,15 +389,13 @@ async function generateUpload() {
     btn.textContent = "Submit";
     btn.addEventListener('click', async () => {
       try {
-        submitFile(course.ID);
+        submitFile(course.ID, index);
       } catch (error) {
         console.error("Error getting download URL:", error);
       }
     });
 
     select.addEventListener('change', (event) => selectFunction(event, file, videoUrl, fileName, fileDesc));
-
-
 
 
     div_start.appendChild(card_container);
@@ -548,18 +547,18 @@ async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, 
  * @function
  * @param {string} courseID - The course ID 
  */
-async function submitFile(courseID) {
+async function submitFile(courseID, index) {
   // Get the file input element
-  var fileInput = document.getElementById('formFileLg');
-  var nameInput = document.getElementById('fileName').value;
-  var desc = document.getElementById('fileDesc').value;
-  var videoUrl = document.getElementById("videoUrl").value;
+  var fileInput = document.getElementById('formFileLg' + index);
+  var nameInput = document.getElementById('fileName'+ index).value;
+  var desc = document.getElementById('fileDesc'+ index).value;
+  var videoUrl = document.getElementById("videoUrl" + index).value;
 
   // Get the selected file
   var file = fileInput.files[0];
 
   // Get the selected value from the dropdown
-  var selectElement = document.getElementById('inputGroupSelect04');
+  var selectElement = document.getElementById('inputGroupSelect04' + index);
   var selectedValue = selectElement.value;
 
   const user = await getCurrentUser();
