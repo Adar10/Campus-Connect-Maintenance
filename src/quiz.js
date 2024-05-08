@@ -86,7 +86,8 @@ async function addQuizQuestions() {
         };
 
         await updateDoc(quizDocRef, {
-            questions: arrayUnion(newQuestion)
+            questions: arrayUnion(newQuestion),
+             likes: 0
         });
 
         // Clear question inputs
