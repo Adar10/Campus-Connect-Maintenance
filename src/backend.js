@@ -5,7 +5,7 @@
 * @returns {Object} The initialized Firebase app.
 */
 import { initializeApp } from 'firebase/app';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged } from 'firebase/auth';
 
 /**
  * Gets the Firestore database instance.
@@ -40,10 +40,36 @@ const firebaseApp = initializeApp(firebaseConfig);
 // Get Firestore database instance
 const db = getFirestore();
 
+const auth = getAuth(firebaseApp);
+
 // Get a reference to the storage service
 const storage = getStorage();
 
 export { storage, db };
+
+let currentUser = null;
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = { uid: user.uid };
+    const userRef = doc(db, "users", user.uid);
+
+    const updateData = {
+      email: user.email,
+    };
+
+    await setDoc(userRef, updateData, { merge: true });
+
+    console.log("User data stored/updated in Firestore.");
+  } else {
+    currentUser = null;
+    console.log("No user is signed in.");
+  }
+});
+
+export async function getCurrentUser() {
+  return currentUser;
+}
 
 /**
  * Asynchronously retrieves the download URL for a file stored in Firebase Storage based on a given path.

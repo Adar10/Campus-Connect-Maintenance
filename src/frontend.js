@@ -1,5 +1,5 @@
 import { getDoc, doc, setDoc, arrayUnion, updateDoc } from 'firebase/firestore';
-import { getCourses, getFileDownloadURL, db, storage } from './backend.js'
+import { getCourses, getFileDownloadURL, db, storage, getCurrentUser } from './backend.js'
 import { ref, uploadBytes } from 'firebase/storage';
 
 /**
@@ -457,19 +457,29 @@ async function selectFunction(event, file, videUrl, name, desc) {
 * @param {File} file - The file object selected by the user.
 */
 async function uploadFile(collectionID, category, fileName, desc, file) {
-
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
-    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc, 0);
-    await uploadBytes(storageRef, file).then((snapshot) => {
-      console.log("Uploaded file succesfully");
-      document.getElementById("alert").style.display = "block";
-      setTimeout(function () {
+
+    // Upload the file and wait for the promise to resolve
+    const uploadResult = await uploadBytes(storageRef, file);
+    console.log("Uploaded file successfully");
+
+    // Update Firestore after the file has been uploaded
+    await addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc, 0);
+    console.log("Firestore document updated");
+
+    // Display the alert and return a resolved promise after the alert hides
+    document.getElementById("alert").style.display = "block";
+    return new Promise(resolve => {
+      setTimeout(() => {
         document.getElementById("alert").style.display = "none";
+        resolve(uploadResult);
       }, 2000);
     });
+
   } catch (error) {
     console.error("Error uploading file:", error);
+    throw error; // Make sure to throw the error to ensure it can be caught by the caller
   }
 }
 
@@ -477,20 +487,34 @@ async function uploadVideos(collectionID, category, URL) {
   try {
     const docRef = doc(db, collectionID, "Videos");
     const snapshot = await getDoc(docRef);
-    var array = snapshot.data().videos;
-    console.log(array[0]);
+
+    // Ensure the document exists and has the correct structure
+    if (!snapshot.exists()) {
+      throw new Error('Document does not exist!');
+    }
+
+    var array = snapshot.data().videos || []; // Ensure the array exists
+    console.log(array[0]); // Just to debug
+
+    // Update the document with new video URL
     await updateDoc(docRef, {
       videos: arrayUnion(URL)
     });
     console.log("Video uploaded");
+
+    // Display the alert and return a resolved promise after the alert hides
     document.getElementById("alert").style.display = "block";
-    setTimeout(function () {
-      document.getElementById("alert").style.display = "none";
-    }, 2000);
+    return new Promise(resolve => {
+      setTimeout(() => {
+        document.getElementById("alert").style.display = "none";
+        resolve("Video updated successfully.");
+      }, 2000);
+    });
+
   } catch (error) {
     console.error("Error uploading video", error);
+    throw error; // Propagate the error
   }
-
 }
 
 /**
@@ -538,13 +562,46 @@ async function submitFile(courseID) {
   var selectElement = document.getElementById('inputGroupSelect04');
   var selectedValue = selectElement.value;
 
+  const user = await getCurrentUser();
+  const uid = user.uid;
+
   if (selectedValue == 1) {
-    uploadFile(courseID, "Lectures", file.name, desc, file);
-  } else if (selectedValue == 2) {
-    uploadVideos(courseID, "Videos", videoUrl);
-  } else if (selectedValue == 3) {
-    uploadFile(courseID, "Exams", file.name, desc, file);
-  }
+    await uploadFile(courseID, "Lectures", file.name, desc, file);
+    const pathString = `${courseID}/Lectures/${file.name}`;
+    const userDocRef = doc(db, 'users', uid);
+    const updateData = {
+        files: {
+            [file.name]: pathString
+        }
+    };
+
+    await setDoc(userDocRef, updateData, { merge: true });
+
+} else if (selectedValue == 2) {
+  await uploadVideos(courseID, "Videos", videoUrl);
+    const pathString = `${courseID}/Videos/${videoUrl}`;
+    const userDocRef = doc(db, 'users', uid);
+    const updateData = {
+        files: {
+            [videoUrl]: pathString
+        }
+    };
+
+    await setDoc(userDocRef, updateData, { merge: true });
+
+} else if (selectedValue == 3) {
+  await uploadFile(courseID, "Exams", file.name, desc, file);
+    const pathString = `${courseID}/Exams/${file.name}`;
+    const userDocRef = doc(db, 'users', uid);
+    const updateData = {
+        files: {
+            [file.name]: pathString
+        }
+    };
+
+    await setDoc(userDocRef, updateData, { merge: true });
+}
+
 }
 
 // Expose submitFile function globally for usage
