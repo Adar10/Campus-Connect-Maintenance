@@ -90,6 +90,15 @@
         background-color: #eee;
         /* Add a hover effect to all links, except for headers */
     }
+
+    .alert {
+            width: 75%;
+            margin-left: 12.5%;
+            text-align: center;
+            z-index: 6;
+            position: fixed;
+            overflow: auto;
+    }
 </style>
 
 <body class="bg-info-subtle" onload="set_name()">
@@ -178,7 +187,20 @@
         </div>
     </div>
 
-    <script>
+
+    <!--LoginStatus-->
+    <div class="alert alert-success" role="alert" id="alert-loggedin" style="display: none;">
+        <strong>Logged in successfully!</strong>
+    </div>
+    <div class="alert alert-danger" role="alert" id="alert-failed" style="display: none;">
+        <strong>Failed to login!</strong>
+    </div>
+    <div class="alert alert-success" role="alert" id="alert-loggedout" style="display: none;">
+        <strong>Logged out successfully!</strong>
+    </div>
+
+
+      <script>
         $("#filter").on("keyup", function () {
             var value = $(this).val().toLowerCase();
             $("#exams > div").filter(function () {
@@ -186,7 +208,6 @@
             });
         });
     </script>
-
 
 
     <script>
@@ -290,6 +311,36 @@
             btn.onclick = google_event;
             btn.innerHTML = "Login";
         }
+        function loginSuccess() {
+            var loginMessage = document.getElementById("alert-loggedin");
+            
+
+                loginMessage.style.display = "block";
+                setTimeout(function() {
+                    loginMessage.style.display = "none";
+                }, 2800);
+        }
+
+        function loginFailed() {
+             var loginMessage = document.getElementById("alert-failed");
+                
+            loginMessage.style.display = "block";
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
+
+        function loggedOut() {
+             var loginMessage = document.getElementById("alert-loggedout");
+                
+            loginMessage.style.display = "block";
+            
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
+            
+        
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
@@ -300,13 +351,18 @@
                 var user = result.user;
                 console.log("Signed in", user);
                 enableLoginButton();
+
+                loginSuccess();
+
                 document.getElementById("login_status").innerHTML = "Logout";
                 change();
 
             }).catch(function (error) {
                 console.error(error);
+                loginFailed();
                 enableLoginButton();
-
+                
+                
                 document.getElementById("login_status").innerHTML = "Login";
             });
         }
@@ -314,6 +370,7 @@
         function signOutWithGoogle() {
             firebase.auth().signOut().then(() => {
                 console.log("Signed out");
+                loggedOut();
                 document.getElementById("login_status").innerHTML = "Login"
             }).catch((error) => {
                 console.error(error);

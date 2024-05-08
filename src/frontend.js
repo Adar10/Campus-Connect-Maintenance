@@ -1,4 +1,4 @@
-import { getDoc, doc, setDoc } from 'firebase/firestore';
+import { getDoc, doc, setDoc, arrayUnion, updateDoc } from 'firebase/firestore';
 import { getCourses, getFileDownloadURL, db, storage } from './backend.js'
 import { ref, uploadBytes } from 'firebase/storage';
 
@@ -245,18 +245,17 @@ async function generateCourseVideos() {
 
 
   if (docSnap) {
-    const data = docSnap.data();
+    const data = docSnap.data().videos;
     if (data) {
       // Iterate over each field in the document's data
-      for (const fieldName in data) {
+      data.forEach((video) => {
 
-        const arrayField = data[fieldName];
-        console.log(arrayField[0]);
+        console.log(video);
 
         const iframe = document.createElement("iframe");
         iframe.width = "400px"
         iframe.height = "315px"
-        iframe.src = arrayField[0];
+        iframe.src = video;
         iframe.title = "hejsan";
         iframe.frameborder = "0"
         iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
@@ -268,7 +267,7 @@ async function generateCourseVideos() {
 
         row.appendChild(iframe);
 
-      }
+      })
     }
   } else {
     console.log("No such document!");
@@ -315,8 +314,6 @@ async function generateUpload() {
   const div_start = document.getElementById("upload");
 
   courses.forEach(course => {
-    console.log(course.name + " has ID: " + course.ID);
-
     const card_container = document.createElement("div");
     card_container.classList.add("card", "container", "mt-5")
     card_container.style.width = "20rem";
@@ -331,12 +328,14 @@ async function generateUpload() {
     file.classList.add("form-control");
     file.id = "formFileLg";
     file.type = "file";
+    file.style.visibility = "hidden";
 
     const fileName = document.createElement("input");
     fileName.classList.add("form-control");
     fileName.id = "fileName";
     fileName.type = "text";
     fileName.placeholder = "Name of file";
+    fileName.style.visibility = "hidden";
 
 
     const fileDesc = document.createElement("input");
@@ -344,6 +343,16 @@ async function generateUpload() {
     fileDesc.id = "fileDesc";
     fileDesc.type = "text"
     fileDesc.placeholder = "Description of file";
+    fileDesc.style.visibility = "hidden";
+
+
+    const videoUrl = document.createElement("input");
+    videoUrl.classList.add("form-control");
+    videoUrl.id = "videoUrl";
+    videoUrl.type = "text";
+    videoUrl.placeholder = "Embedded video link"
+    videoUrl.style.visibility = "hidden";
+
 
     const div_input = document.createElement("div");
     div_input.classList.add("input-group");
@@ -352,6 +361,7 @@ async function generateUpload() {
     select.classList.add("custom-select");
     select.id = "inputGroupSelect04";
     select.style.flex = "1";
+
 
     const opt_type = document.createElement("option");
     opt_type.setAttribute('selected', '');
@@ -367,11 +377,7 @@ async function generateUpload() {
 
     const opt_3 = document.createElement("option");
     opt_3.value = "3";
-    opt_3.textContent = "Quizzes";
-
-    const opt_4 = document.createElement("option");
-    opt_4.value = "4";
-    opt_4.textContent = "Exams";
+    opt_3.textContent = "Exams";
 
     const div_append = document.createElement("div");
     div_append.classList.add("input-group-append");
@@ -388,6 +394,9 @@ async function generateUpload() {
       }
     });
 
+    select.addEventListener('change', (event) => selectFunction(event, file, videoUrl, fileName, fileDesc));
+
+
 
 
     div_start.appendChild(card_container);
@@ -396,16 +405,45 @@ async function generateUpload() {
     card_body.appendChild(file);
     card_body.appendChild(fileName);
     card_body.appendChild(fileDesc);
+    card_body.appendChild(videoUrl);
     card_body.appendChild(div_input);
     div_input.appendChild(select);
     select.appendChild(opt_type);
     select.appendChild(opt_1);
     select.appendChild(opt_2);
     select.appendChild(opt_3);
-    select.appendChild(opt_4);
     div_input.appendChild(btn);
 
+    console.log("upload loaded successfully");
+
   });
+}
+
+async function selectFunction(event, file, videUrl, name, desc) {
+  const select = event.target;
+  const option = select.value;
+
+  if (option == 2) {
+
+    videUrl.style.visibility = "visible";
+
+    file.style.visibility = "hidden";
+    name.style.visibility = "hidden";
+    desc.style.visibility = "hidden";
+  }
+  else if (option == 1 || option == 3) {
+    videUrl.style.visibility = "hidden";
+
+    file.style.visibility = "visible";
+    name.style.visibility = "visible";
+    desc.style.visibility = "visible";
+  }
+  else {
+    videUrl.style.visibility = "hidden";
+    file.style.visibility = "hidden";
+    name.style.visibility = "hidden";
+    desc.style.visibility = "hidden";
+  }
 }
 
 /**
@@ -419,15 +457,40 @@ async function generateUpload() {
 * @param {File} file - The file object selected by the user.
 */
 async function uploadFile(collectionID, category, fileName, desc, file) {
+
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
     addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc, 0);
     await uploadBytes(storageRef, file).then((snapshot) => {
       console.log("Uploaded file succesfully");
+      document.getElementById("alert").style.display = "block";
+      setTimeout(function () {
+        document.getElementById("alert").style.display = "none";
+      }, 2000);
     });
   } catch (error) {
     console.error("Error uploading file:", error);
   }
+}
+
+async function uploadVideos(collectionID, category, URL) {
+  try {
+    const docRef = doc(db, collectionID, "Videos");
+    const snapshot = await getDoc(docRef);
+    var array = snapshot.data().videos;
+    console.log(array[0]);
+    await updateDoc(docRef, {
+      videos: arrayUnion(URL)
+    });
+    console.log("Video uploaded");
+    document.getElementById("alert").style.display = "block";
+    setTimeout(function () {
+      document.getElementById("alert").style.display = "none";
+    }, 2000);
+  } catch (error) {
+    console.error("Error uploading video", error);
+  }
+
 }
 
 /**
@@ -466,6 +529,7 @@ async function submitFile(courseID) {
   var fileInput = document.getElementById('formFileLg');
   var nameInput = document.getElementById('fileName').value;
   var desc = document.getElementById('fileDesc').value;
+  var videoUrl = document.getElementById("videoUrl").value;
 
   // Get the selected file
   var file = fileInput.files[0];
@@ -474,14 +538,11 @@ async function submitFile(courseID) {
   var selectElement = document.getElementById('inputGroupSelect04');
   var selectedValue = selectElement.value;
 
-  console.log(file.name);
   if (selectedValue == 1) {
     uploadFile(courseID, "Lectures", file.name, desc, file);
   } else if (selectedValue == 2) {
-    uploadFile(courseID, "Videos", file.name, desc, file);
+    uploadVideos(courseID, "Videos", videoUrl);
   } else if (selectedValue == 3) {
-    uploadFile(courseID, "Quiz", file.name, desc, file);
-  } else if (selectedValue == 4) {
     uploadFile(courseID, "Exams", file.name, desc, file);
   }
 }

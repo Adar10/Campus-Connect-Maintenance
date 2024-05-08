@@ -26,6 +26,16 @@
 </head>
 
 <style>
+
+    .alert {
+                width: 75%;
+                margin-left: 12.5%;
+                text-align: center;
+                z-index: 6;
+                position: fixed;
+                overflow: auto;
+        }
+        
     .navbar .navbar-nav .nav-link:hover {
         background-color: gray;
         color: black;
@@ -125,6 +135,18 @@
             </ul>
         </div>
     </nav>
+
+
+    <!--LoginStatus-->
+    <div class="alert alert-success" role="alert" id="alert-loggedin" style="display: none;">
+        <strong>Logged in successfully!</strong>
+    </div>
+    <div class="alert alert-danger" role="alert" id="alert-failed" style="display: none;">
+        <strong>Failed to login!</strong>
+    </div>
+    <div class="alert alert-success" role="alert" id="alert-loggedout" style="display: none;">
+        <strong>Logged out successfully!</strong>
+    </div>
 
     <div class="container-fluid p-5 bg-info-subtle text-dark text-center">
         <h1 id="coursename">Template for navbar and footer</h1>
@@ -277,6 +299,37 @@
             btn.innerHTML = "Login";
         }
 
+        function loginSuccess() {
+            var loginMessage = document.getElementById("alert-loggedin");
+            
+
+                loginMessage.style.display = "block";
+                setTimeout(function() {
+                    loginMessage.style.display = "none";
+                }, 2800);
+        }
+
+        function loginFailed() {
+             var loginMessage = document.getElementById("alert-failed");
+                
+            loginMessage.style.display = "block";
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
+
+        function loggedOut() {
+             var loginMessage = document.getElementById("alert-loggedout");
+                
+            loginMessage.style.display = "block";
+            
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
+            
+        
+
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
 
@@ -286,11 +339,15 @@
                 var user = result.user;
                 console.log("Signed in", user);
                 enableLoginButton();
+
+                loginSuccess();
+
                 document.getElementById("login_status").innerHTML = "Logout";
                 change();
 
             }).catch(function (error) {
                 console.error(error);
+                loginFailed();
                 enableLoginButton();
 
                 document.getElementById("login_status").innerHTML = "Login";
@@ -300,6 +357,7 @@
         function signOutWithGoogle() {
             firebase.auth().signOut().then(() => {
                 console.log("Signed out");
+                loggedOut();
                 document.getElementById("login_status").innerHTML = "Login"
             }).catch((error) => {
                 console.error(error);

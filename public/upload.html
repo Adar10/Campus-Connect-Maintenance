@@ -25,7 +25,17 @@
 
 </head>
 
-<style>
+<style> 
+
+  .alert {
+              width: 75%;
+              margin-left: 12.5%;
+              text-align: center;
+              z-index: 6;
+              position: fixed;
+              overflow: auto;
+      }
+      
   .navbar .navbar-nav .nav-link:hover {
     background-color: gray;
     color: black;
@@ -94,7 +104,7 @@
     /* Hidden by default */
     position: fixed;
     /* Stay in place */
-    z-index: 2;
+    z-index: 5;
     /* Sit on top */
     padding-top: 100px;
     /* Location of the box */
@@ -108,7 +118,7 @@
     /* Enable scroll if needed */
     background-color: rgb(0, 0, 0);
     /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0);
     /* Black w/ opacity */
   }
 
@@ -136,10 +146,22 @@
     cursor: pointer;
   }
 
+  .alert {
+    width: 75%;
+    margin-left: 12.5%;
+    text-align: center;
+    z-index: 6;
+    position: fixed;
+    overflow: auto;
+  }
+
+
+
   /*END OF MODAL CSS*/
 </style>
 
 <body class="bg-info-subtle" onload="set_name()">
+
 
 
   <!-- Start of navbar-->
@@ -179,7 +201,16 @@
   </nav>
   <!--End of navbar-->
 
-
+  <!--LoginStatus-->
+  <div class="alert alert-success" role="alert" id="alert-loggedin" style="display: none;">
+    <strong>Logged in successfully!</strong>
+  </div>
+  <div class="alert alert-danger" role="alert" id="alert-failed" style="display: none;">
+      <strong>Failed to login!</strong>
+  </div>
+  <div class="alert alert-success" role="alert" id="alert-loggedout" style="display: none;">
+      <strong>Logged out successfully!</strong>
+  </div>
 
   <!--Start of header-->
 
@@ -187,17 +218,10 @@
     <h1 id="coursename">Upload to our database</h1>
   </div>
 
-  <!-- THIS CODE IS NO LONGER NEEDED
+  <div class="alert alert-success alert-dismissible fade show" style="display: none;" role="alert" id="alert">
+    <strong>Upload successful!</strong>
+  </div>
 
-  <script type="text/javascript">
-    //localStorage.setItem("highScore","564544");
-    var courseName = localStorage.getItem("course");
-    // Considering you already have highScore set in local storage.
-    // Uncomment your line number 10 if you want to set in local storage
-    document.getElementById('coursename').innerHTML = "Upload to our database";
-  </script>
-  -->
-  <!--End of header-->
 
   <div class="container mt-5 bg-info-subtle" style="margin-bottom: 5rem;">
     <h2>Search for courses</h2>
@@ -231,36 +255,6 @@
     });
   </script>
 
-
-  <!-- 
-  <div class="container mt-5" style="margin-bottom: 5rem;">
-    <div class="row" id="mycard">
-
-
-      <div class="card container mt-5" style="width: 20rem;">
-        <div class="card-body">
-          <h5 class="card-title">Sannolikhet och statistik</h5>
-          <input class="form-control" id="formFileLg" type="file">
-          <input class="form-control" id="fileName" type="text" placeholder="Name of file">
-          <input class="form-control" id="fileDesc" type="text" placeholder="Description of file">
-          <div class="input-group">
-            <select class="custom-select" id="inputGroupSelect04" style="flex: 1;">
-              <option selected>Choose type of data</option>
-              <option value="1">Lectures</option>
-              <option value="2">Videos</option>
-              <option value="3">Quizzes</option>
-              <option value="4">Exams</option>
-            </select>
-            <div class="input-group-append">
-              <button class="btn btn-primary " type="button" onclick="">Submit</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
--->
-
   <div class="container mt-5" style="margin-bottom: 5rem;">
     <div id="mycard">
       <div class="row" id="upload">
@@ -271,8 +265,8 @@
   </div>
 
 
+
   <script>
-    // Call your function here
     document.addEventListener("DOMContentLoaded", function () {
       try {
         console.log("Generating upload");
@@ -282,6 +276,7 @@
       }
 
     });
+
   </script>
 
 
@@ -377,34 +372,71 @@
       btn.innerHTML = "Login";
     }
 
-    function signInWithGoogle() {
-      var provider = new firebase.auth.GoogleAuthProvider();
+        function loginSuccess() {
+            var loginMessage = document.getElementById("alert-loggedin");
+            
 
-      disableLoginButton();
+                loginMessage.style.display = "block";
+                setTimeout(function() {
+                    loginMessage.style.display = "none";
+                }, 2800);
+        }
 
-      firebase.auth().signInWithPopup(provider).then(function (result) {
-        var user = result.user;
-        console.log("Signed in", user);
-        enableLoginButton();
-        document.getElementById("login_status").innerHTML = "Logout";
-        change();
+        function loginFailed() {
+             var loginMessage = document.getElementById("alert-failed");
+                
+            loginMessage.style.display = "block";
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
 
-      }).catch(function (error) {
-        console.error(error);
-        enableLoginButton();
+        function loggedOut() {
+             var loginMessage = document.getElementById("alert-loggedout");
+                
+            loginMessage.style.display = "block";
+            
+            setTimeout(function() {
+                loginMessage.style.display = "none";
+            }, 2800);
+        }
+            
+        
 
-        document.getElementById("login_status").innerHTML = "Login";
-      });
-    }
+        function signInWithGoogle() {
+            var provider = new firebase.auth.GoogleAuthProvider();
+            
+            disableLoginButton();
+            
+            firebase.auth().signInWithPopup(provider).then(function (result) {
+                var user = result.user;
+                console.log("Signed in", user);
+                enableLoginButton();
 
-    function signOutWithGoogle() {
-      firebase.auth().signOut().then(() => {
-        console.log("Signed out");
-        document.getElementById("login_status").innerHTML = "Login"
-      }).catch((error) => {
-        console.error(error);
-      });
-    }
+                loginSuccess();
+
+                document.getElementById("login_status").innerHTML = "Logout";
+                change();
+
+            }).catch(function (error) {
+                console.error(error);
+                loginFailed();
+                enableLoginButton();
+                
+                
+                document.getElementById("login_status").innerHTML = "Login";
+            });
+        }
+
+        function signOutWithGoogle() {
+            firebase.auth().signOut().then(() => {
+                console.log("Signed out");
+                loggedOut();
+                document.getElementById("login_status").innerHTML = "Login"
+            }).catch((error) => {
+                console.error(error);
+            });
+        }
 
     //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
