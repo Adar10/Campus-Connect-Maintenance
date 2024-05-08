@@ -1,16 +1,16 @@
-import { initializeApp } from "firebase/app";  
+import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, getDoc, arrayUnion } from "firebase/firestore";
 
 import { db } from './backend.js';
- 
+
 
 // DOM elements
 
 //TODO: Documentation
 
 const questionElem = document.getElementById("question");
-const answerButtons = document.getElementById("answer-buttons"); 
-const nextButton = document.getElementById("next-btn"); 
+const answerButtons = document.getElementById("answer-buttons");
+const nextButton = document.getElementById("next-btn");
 
 
 /**
@@ -42,9 +42,9 @@ async function createQuiz() {
     if (quizExists) {
         errorMessageElement.textContent = "A quiz with this name already exists. Please choose another name.";
     } else {
-        errorMessageElement.textContent = ""; 
+        errorMessageElement.textContent = "";
         errorMessageElement.hidden;
-        const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName); 
+        const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
         await setDoc(quizDocRef, {
             questions: []
         });
@@ -67,12 +67,12 @@ async function createQuiz() {
 async function addQuizQuestions() {
     var courseID = localStorage.getItem("ID");
     var quizName = document.getElementById("quiz-name").value;
-    const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName); 
+    const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
 
-   
+
     var questionInputs = $('.question-inputs');
 
-    questionInputs.each(async function() {
+    questionInputs.each(async function () {
         var inputQuestion = $(this).find('.question').val();
         var correctAns = $(this).find('.correct-answer').val();
         var incorrectAnswer1 = $(this).find('.incorrect-answer1').val();
@@ -95,10 +95,10 @@ async function addQuizQuestions() {
 
     var confirmationMessageElement = document.getElementById("confirmation-message");
     confirmationMessageElement.textContent = "Question submitted successfully!";
-    confirmationMessageElement.style.display = "block"; 
+    confirmationMessageElement.style.display = "block";
 
-    
-    setTimeout(function() {
+
+    setTimeout(function () {
         confirmationMessageElement.style.display = "none";
     }, 2800); // timeout 2800 milliseconds
 
@@ -120,29 +120,141 @@ function getAllQuizzes() {
 
     // Reference to the Quizzes collection in the database
     const docRef = doc(db, courseID, "Quizzes");
-    const docSnap = collection(docRef ,"all-quizzes");
+    const docSnap = collection(docRef, "all-quizzes");
+
+    const row = document.getElementById('quizzes');
 
     // Fetch all documents in the "all-quizzes" subcollection
     getDocs(docSnap).then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-            const quizID = doc.id; 
-            const button = document.createElement("button"); 
-            button.innerHTML = quizID; 
-            button.classList.add("btn", "quizOption-button"); 
-            
+            const quizID = doc.id;
+            const button = document.createElement("button");
+            button.innerHTML = quizID;
+            button.classList.add("btn", "quizOption-button");
+            button.style.display = "inline-block";
+
             //Add click event listener to each quiz button
-            button.addEventListener("click", function() {
-                
+            button.addEventListener("click", function () {
+
                 localStorage.setItem("selectedQuizID", quizID);
-                
+
                 window.location.href = "quiz.html";
             });
-            // Append the button to the quizzes container
-            document.getElementById('quizzes').appendChild(button);
+
+            // Creat card container
+            const card_container = document.createElement("div");
+            card_container.classList.add("card", "container", "mt-5", "border", "border-dark");
+            card_container.style.width = "25rem";
+
+            //creat card body
+            const card_body = document.createElement("div");
+            card_body.classList.add("card-body");
+
+
+            //create heart
+            const heart = document.createElement("p");
+            heart.classList.add("btn", "shadow-none");
+            getLikeFromQuiz(quizID).then(likeCount => {
+                heart.textContent = "🖤" + likeCount;
+            });
+            heart.style.fontSize = "2rem";
+            heart.style.display = "inline-block";
+
+            heart.addEventListener('click', async () => {
+                try {
+                    const count = await getLikeFromQuiz(quizID);
+                    console.log(count);
+                    if (heart.textContent == "🖤" + count) {
+
+                        await uppdateLikes(count + 1, quizID);
+                        heart.textContent = "❤" + await getLikeFromQuiz(quizID);
+
+                    }
+                    else {
+                        await uppdateLikes(count - 1, quizID);
+                        heart.textContent = "🖤" + await getLikeFromQuiz(quizID);
+                    }
+                } catch (error) {
+                    console.error("error", error);
+                }
+            });
+
+            //append all
+            card_body.appendChild(button);
+            card_body.appendChild(heart);
+            card_container.appendChild(card_body);
+            row.appendChild(card_container);
+
         });
     }).catch((error) => {
         console.log("Error getting documents: ", error);
     });
+}
+
+/**
+ * Uppdates the number of likes a quiz has
+ * 
+ * @function shuffleArray
+ * @param {number} count - The number to change the likes to
+ * @param {string} quizID - The name of the quiz
+ * @returns {void} This function do not return anything 
+ */
+async function uppdateLikes(count, quizID) {
+    //Retrieve the course id from localStorage
+    var courseID = localStorage.getItem("ID");
+    console.log(courseID);
+
+    //Reference to the quizzes collection in the database
+    const docRef = doc(db, courseID, "Quizzes");
+
+    //Reference to the specific quiz document
+    const docSnap = collection(docRef, "all-quizzes");
+    console.log(docSnap);
+
+    //Get the quiz document snapshot
+    const quizDocRef = doc(docSnap, quizID);
+    const quizDocSnap = await getDoc(quizDocRef);
+
+    if (quizDocSnap.exists()) { // Check if the document snapshot exists
+        // Update the likes count in the document
+        await updateDoc(quizDocRef, {
+            likes: count
+        });
+    } else {
+        console.log("No such document!");
+    }
+}
+
+/**
+ * Gets the number of likes a quiz has
+ * 
+ * @function getLikeFromQuiz
+ * @param {string} quizID - The name of the quiz
+ * @returns {number} - returns the number of likes
+ */
+async function getLikeFromQuiz(quizID) {
+
+    //Retrieve the course id from localStorage
+    var courseID = localStorage.getItem("ID");
+    console.log(courseID);
+
+    //Reference to the quizzes collection in the database
+    const docRef = doc(db, courseID, "Quizzes");
+
+    //Reference to the specific quiz document
+    const docSnap = collection(docRef, "all-quizzes");
+    console.log(docSnap);
+
+    //Get the quiz document snapshot
+    const quizDocRef = doc(docSnap, quizID);
+    const quizDocSnap = await getDoc(quizDocRef);
+
+    if (docSnap) {
+        return quizDocSnap.data().likes;
+    } else {
+        console.log("No such document!");
+    }
+
 }
 
 
@@ -174,12 +286,12 @@ async function fetchQuiz(quizID) {
     //Retrieve the course id from localStorage
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
-    
+
     //Reference to the quizzes collection in the database
     const docRef = doc(db, courseID, "Quizzes");
-    
+
     //Reference to the specific quiz document
-    const docSnap = collection(docRef ,"all-quizzes");
+    const docSnap = collection(docRef, "all-quizzes");
     console.log(docSnap);
 
     //Get the quiz document snapshot
@@ -189,32 +301,32 @@ async function fetchQuiz(quizID) {
     //Extract questions data from the quiz document
     const questionsData = quizDocSnap.data().questions;
     let docQuestions = [];
-    
-     //Process each question in the quiz       
+
+    //Process each question in the quiz       
     if (questionsData) {
         questionsData.forEach((questionItem) => {
-        const correctAnswer = questionItem.correctAnswer;
-        const wrongAnswersMap = questionItem.incorrectAnswers;
-        const questionText = questionItem.question;
-    
-        const wrongAnswersArray = Object.values(wrongAnswersMap);
-            
-        //Combine correct and incorrect answers, shuffle them
-        var allAnswers = [correctAnswer, ...wrongAnswersArray];
-        shuffleArray(allAnswers);
-    
-        //Add question data to the array
-        docQuestions.push({
-            question: questionText,
-            answers: allAnswers,
-            correctAnswer: correctAnswer
+            const correctAnswer = questionItem.correctAnswer;
+            const wrongAnswersMap = questionItem.incorrectAnswers;
+            const questionText = questionItem.question;
+
+            const wrongAnswersArray = Object.values(wrongAnswersMap);
+
+            //Combine correct and incorrect answers, shuffle them
+            var allAnswers = [correctAnswer, ...wrongAnswersArray];
+            shuffleArray(allAnswers);
+
+            //Add question data to the array
+            docQuestions.push({
+                question: questionText,
+                answers: allAnswers,
+                correctAnswer: correctAnswer
             });
-        
+
         });
         console.log(docQuestions);
     }
-     //Return the array of processed quiz questions  
-    return docQuestions;            
+    //Return the array of processed quiz questions  
+    return docQuestions;
 }
 
 
@@ -234,7 +346,7 @@ let questions = [];   //Array with all questions
 * @throws {Error} If there is an error fetching or processing quiz questions.
 */
 async function startQuiz(quizID) {
-    
+
     let quizQuestion = await fetchQuiz(quizID);
     questionNumber = 1;
     currentQuestionIndex = 0;
@@ -244,19 +356,19 @@ async function startQuiz(quizID) {
     nextButton.innerHTML = "Next";
 
     for (let i = 0; i < quizQuestion.length; i++) {
-        
+
         questions = quizQuestion[i];
-        
+
         showQuestion(quizQuestion[i]);
-            
+
         await new Promise(resolve => {
             nextButton.onclick = resolve;
-           
+
         });
     }
     showScore();
 }
-  
+
 
 /**
 * Displays the current quiz question with answer option on the page.
@@ -265,39 +377,39 @@ async function startQuiz(quizID) {
 * @param {Object} arr - An object containing the current question and it's answer options.
 * @returns {void} This function updates the DOM to show the current questions and answer options.
 */
-function showQuestion(arr){
+function showQuestion(arr) {
     resetState();
-    let currentQuestions = arr; 
-    let questionNo = questionNumber++; 
-    questionElem.innerHTML = questionNo + ". " + currentQuestions.question; 
+    let currentQuestions = arr;
+    let questionNo = questionNumber++;
+    questionElem.innerHTML = questionNo + ". " + currentQuestions.question;
 
     currentQuestions.answers.forEach(answer => {
-        const button = document.createElement("button"); 
+        const button = document.createElement("button");
         button.innerHTML = answer;
-        button.classList.add("btn"); 
-        answerButtons.appendChild(button); 
-        if(answer === currentQuestions.correctAnswer){
-            button.dataset.correct = true; 
+        button.classList.add("btn");
+        answerButtons.appendChild(button);
+        if (answer === currentQuestions.correctAnswer) {
+            button.dataset.correct = true;
         }
         button.addEventListener("click", selectAnswer)
-    }); 
+    });
 }
 
-  
+
 /**
 * Resets the state of the quiz by hiding the next button and removing all answer buttons from the DOM.
 * 
 * @function resetState
 * @returns {void} This function updates the DOM to reset the quiz state. 
 */
-function resetState(){
-    nextButton.style.display = "none"; 
-    while(answerButtons.firstChild){
+function resetState() {
+    nextButton.style.display = "none";
+    while (answerButtons.firstChild) {
         answerButtons.removeChild(answerButtons.firstChild);
     }
 }
-  
- 
+
+
 /**
 * Handles the user's selection of an answer for a quiz question.
 * 
@@ -305,45 +417,45 @@ function resetState(){
 * @param {Event} e - The event object representing the click event on an answer button.
 * @returns {void} This function updates the DOM to reflect the user's answer selection and enables the next button.  
 */
-function selectAnswer(e){
-    const selectedBtn = e.target; 
-    
-    const isCorrect = selectedBtn.innerHTML === questions.correctAnswer; 
-    if(isCorrect){
+function selectAnswer(e) {
+    const selectedBtn = e.target;
+
+    const isCorrect = selectedBtn.innerHTML === questions.correctAnswer;
+    if (isCorrect) {
         selectedBtn.classList.add("correct");
-        score++;  
-    }else{
-        selectedBtn.classList.add("incorrect"); 
+        score++;
+    } else {
+        selectedBtn.classList.add("incorrect");
     }
     // Disable all buttons after selection
     Array.from(answerButtons.children).forEach(button => {
-        if(button.innerHTML === questions.correctAnswer){
-            button.classList.add("correct"); 
+        if (button.innerHTML === questions.correctAnswer) {
+            button.classList.add("correct");
         }
-        button.disabled = true; 
-    }); 
-    nextButton.style.display = "block"; 
+        button.disabled = true;
+    });
+    nextButton.style.display = "block";
 }
 
-  
+
 /**
 * Displays the final score of the quiz and allow the user to quit or return to the quiz menu.
 * 
 * @function showScore
 * @returns {void} This function updates the DOM to show the user's final score and provides options to quit or return to the quiz menu. 
 */
-function showScore(){
-    resetState(); 
-    questionElem.innerHTML = `You scored ${score} out of ${allQuestionlength}!`; 
-    nextButton.innerHTML = "Quit"; 
+function showScore() {
+    resetState();
+    questionElem.innerHTML = `You scored ${score} out of ${allQuestionlength}!`;
+    nextButton.innerHTML = "Quit";
     nextButton.style.display = "block";
 
     console.log(ID);
-    nextButton.addEventListener("click", function() {  
+    nextButton.addEventListener("click", function () {
         window.location.href = "quiz_menu.html";
     });
 }
-  
+
 
 /**
 * Handles the "Next" button functionality during the quiz.
@@ -351,13 +463,13 @@ function showScore(){
 * @function handleNextButton
 * @returns {void} This function updates the current question index and checks if the quiz is complete to show the final score.
 */
-function handleNextButton(){
+function handleNextButton() {
     currentQuestionIndex++
-    if(currentQuestionIndex > allQuestionlength){
-        showScore(); 
+    if (currentQuestionIndex > allQuestionlength) {
+        showScore();
     }
 }
-  
+
 
 //Assigning functions to global variables for ease of access
 

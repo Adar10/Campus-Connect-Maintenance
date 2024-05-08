@@ -29,7 +29,7 @@ async function generateCourseNavigation() {
     const h5 = document.createElement("h5");
 
     const button = document.createElement("button");
-    button.classList.add("btn", "btn-primary", "btn-lg");
+    button.classList.add("btn", "btn-info", "btn-lg");
     button.style.marginRight = "2rem";
     button.style.marginTop = "2rem";
     button.addEventListener('click', () => {
@@ -75,7 +75,7 @@ async function generateCourseExams() {
         console.log(arrayField[0]);
 
         const card_container = document.createElement("div");
-        card_container.classList.add("card", "container", "mt-5");
+        card_container.classList.add("card", "container", "mt-5", "border", "border-dark");
         card_container.style.width = "20rem";
 
 
@@ -88,7 +88,7 @@ async function generateCourseExams() {
 
         const button = document.createElement("button");
         button.textContent = "Click to open";
-        button.classList.add("btn", "btn-primary", "btn-lg");
+        button.classList.add("btn", "btn-info", "btn-lg");
         button.addEventListener('click', async () => {
           try {
             const URL = await getFileDownloadURL(arrayField[1]);
@@ -98,8 +98,32 @@ async function generateCourseExams() {
           }
         });
 
+        const heart = document.createElement("p");
+        heart.classList.add("btn", "shadow-none");
+        heart.textContent = "🖤" + arrayField[3];
+        heart.style.fontSize = "2rem";
+
+        heart.addEventListener('click', async () => {
+          try {
+            const count = await getLikeCount("Exams", arrayField[0]);
+            if (heart.textContent == "🖤" + count) {
+
+              await addArrayFieldToDocument(courseID, "Exams", arrayField[0], arrayField[1], arrayField[2], count + 1);
+              heart.textContent = "❤" + await getLikeCount("Exams", arrayField[0]);
+
+            }
+            else {
+              await addArrayFieldToDocument(courseID, "Exams", arrayField[0], arrayField[1], arrayField[2], count - 1);
+              heart.textContent = "🖤" + await getLikeCount("Exams", arrayField[0]);
+            }
+          } catch (error) {
+            console.error("error", error);
+          }
+        });
+
         card_body.appendChild(name);
         card_body.appendChild(button);
+        card_body.appendChild(heart);
         card_container.appendChild(card_body);
         row.appendChild(card_container);
 
@@ -143,7 +167,7 @@ async function generateCourseLectures() {
         console.log(arrayField[0]);
 
         const card_container = document.createElement("div");
-        card_container.classList.add("card", "container", "mt-5");
+        card_container.classList.add("card", "container", "mt-5", "border", "border-dark");
         card_container.style.width = "20rem";
 
 
@@ -159,7 +183,7 @@ async function generateCourseLectures() {
 
         const button = document.createElement("button");
         button.textContent = "Click to open";
-        button.classList.add("btn", "btn-primary", "btn-lg");
+        button.classList.add("btn", "btn-info", "btn-lg");
         button.addEventListener('click', async () => {
           try {
             const URL = await getFileDownloadURL(arrayField[1]);

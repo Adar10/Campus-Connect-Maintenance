@@ -26,13 +26,15 @@
 </head>
 
 <style>
+  .container {
+    margin-top: 5vh;
+    /* Adjust as needed */
+    padding-top: 25vh;
+    /* Adjust as needed */
+    padding-bottom: 30vh;
+    /* Adjust as needed */
+  }
 
-
-.container {
-    margin-top: 5vh;  /* Adjust as needed */
-    padding-top: 25vh;   /* Adjust as needed */
-    padding-bottom: 30vh;   /* Adjust as needed */
-}
   .navbar .navbar-nav .nav-link:hover {
     background-color: gray;
     color: black;
@@ -101,10 +103,10 @@
             position: fixed;
             overflow: auto;
     }
-  
+
 </style>
 
-<body class="bg-info" onload="set_name()">
+<body class="bg-info-subtle" onload="set_name()">
 
 
   <!-- Start of navbar-->
@@ -156,16 +158,16 @@
   </div>
 
 
-<!-- Login page -->
-<div class="container mt-3">
+  <!-- Login page -->
+  <div class="container mt-3">
     <h2 class="text-center">Login required to upload</h2>
     <div class="text-center mt-3">
-      <button class="btn btn-primary" id="loginButton" onclick="google_event() ">Sign in with Google</button>
+      <button class="btn btn-info" id="loginButton" onclick="google_event() ">Sign in with Google</button>
     </div>
   </div>
-<!-- End of content -->
+  <!-- End of content -->
 
-  
+
 
 
 
@@ -184,90 +186,90 @@
   </script>
 
   <script>
-        function createoncefunction() {
-            let hasbeencalled = false;
-            return function () {
-                if (!hasbeencalled) {
-                    signOutWithGoogle();
-                    var myVariable = "false";
-                    localStorage.setItem("myVariable", myVariable);
-                    hasbeencalled = true;
-                }
-            }
+    function createoncefunction() {
+      let hasbeencalled = false;
+      return function () {
+        if (!hasbeencalled) {
+          signOutWithGoogle();
+          var myVariable = "false";
+          localStorage.setItem("myVariable", myVariable);
+          hasbeencalled = true;
         }
+      }
+    }
 
-        const state = createoncefunction();
+    const state = createoncefunction();
 
-        function set_name() {
-            var status = localStorage.getItem("myVariable");
-            if (status === "false") {
-                document.getElementById("login_status").innerHTML = "Login"
-            }
-            else {
-                document.getElementById("login_status").innerHTML = "Logout"
-            }
+    function set_name() {
+      var status = localStorage.getItem("myVariable");
+      if (status === "false") {
+        document.getElementById("login_status").innerHTML = "Login"
+      }
+      else {
+        document.getElementById("login_status").innerHTML = "Logout"
+      }
 
-        }
+    }
 
-        function google_event() {
-            var status = localStorage.getItem("myVariable");
-            if (status === "false") {
-                event_login();
+    function google_event() {
+      var status = localStorage.getItem("myVariable");
+      if (status === "false") {
+        event_login();
 
-            }
-            else {
-                event_logout();
+      }
+      else {
+        event_logout();
 
-            }
-        }
+      }
+    }
 
-        function event_login() {
-            signInWithGoogle();
-            return;
-        }
+    function event_login() {
+      signInWithGoogle();
+      return;
+    }
 
-        function event_logout() {
-            change();
-            signOutWithGoogle();
-            return;
-        }
+    function event_logout() {
+      change();
+      signOutWithGoogle();
+      return;
+    }
 
-        function change() {
-            var myVariable = localStorage.getItem("myVariable");
-            if (myVariable === "false") {
-                myVariable = "true";
-            }
-            else {
-                myVariable = "false";
-            }
-            localStorage.setItem("myVariable", myVariable);
-        }
+    function change() {
+      var myVariable = localStorage.getItem("myVariable");
+      if (myVariable === "false") {
+        myVariable = "true";
+      }
+      else {
+        myVariable = "false";
+      }
+      localStorage.setItem("myVariable", myVariable);
+    }
 
-        function disableLoginButton() {
-            var btn = document.getElementById('login_status');
-            btn.onclick = function(event) {
-                event.preventDefault();
-            }
-            btn.innerHTML = "Waiting for response...";
-        }
+    function disableLoginButton() {
+      var btn = document.getElementById('login_status');
+      btn.onclick = function (event) {
+        event.preventDefault();
+      }
+      btn.innerHTML = "Waiting for response...";
+    }
 
-        function enableLoginButton() {
-            var btn = document.getElementById('login_status');
-            btn.setAttribute("href", "#");
-            btn.onclick = google_event;
-            btn.innerHTML = "Login";
-        }
+    function enableLoginButton() {
+      var btn = document.getElementById('login_status');
+      btn.setAttribute("href", "#");
+      btn.onclick = google_event;
+      btn.innerHTML = "Login";
+    }
 
-        function disableUploadLoginButton() {
-            var button = document.getElementById("loginButton");
-            button.disabled = true;
-            button.innerHTML = "Waiting for response";
-        }
-        function enableUploadLoginButton() {
-            var button = document.getElementById("loginButton");
-            button.disabled = false;
-            button.innerHTML = "Sign in with Google";
-        }
+    function disableUploadLoginButton() {
+      var button = document.getElementById("loginButton");
+      button.disabled = true;
+      button.innerHTML = "Waiting for response";
+    }
+    function enableUploadLoginButton() {
+      var button = document.getElementById("loginButton");
+      button.disabled = false;
+      button.innerHTML = "Sign in with Google";
+    }
 
         function loginSuccess() {
             var loginMessage = document.getElementById("alert-loggedin");
@@ -335,18 +337,44 @@
             });
         }
 
-        //document.getElementById('googleSignInButton').addEventListener('click', event_login);
+      firebase.auth().signInWithPopup(provider).then(function (result) {
+        var user = result.user;
+        console.log("Signed in", user);
+        enableLoginButton();
+        enableUploadLoginButton();
+        document.getElementById("login_status").innerHTML = "Logout";
+        change();
 
-        //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
+      }).catch(function (error) {
+        console.error(error);
+        enableLoginButton();
+        enableUploadLoginButton();
 
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                console.log("User is signed in");
-                window.location.href = "upload.html";
-            } else {
-                console.log("User is signed out");
-            }
-        })
+        document.getElementById("login_status").innerHTML = "Login";
+      });
+    }
+
+    function signOutWithGoogle() {
+      firebase.auth().signOut().then(() => {
+        console.log("Signed out");
+        document.getElementById("login_status").innerHTML = "Login"
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
+
+    //document.getElementById('googleSignInButton').addEventListener('click', event_login);
+
+    //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
+
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        console.log("User is signed in");
+        window.location.href = "upload.html";
+      } else {
+        console.log("User is signed out");
+      }
+    })
   </script>
 
 
@@ -381,43 +409,46 @@
       <!-- Section: Links  -->
       <section class="" style="margin-top: -200px;">
         <div class="container text-center text-md-start mt-5">
-            <!-- Grid row -->
-            <div class="row mt-3">
-                <!-- Grid column -->
-                <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
-                    <!-- Content -->
-                    <h6 class="text-uppercase fw-bold">Campus Connect</h6>
-                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 3px" />
-                    <p>Here at campus connect.......</p>
-                </div>
-                <!-- Grid column -->
-                <!-- Grid column -->
-                <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
-                    <!-- Links -->
-                    <h6 class="text-uppercase fw-bold">Useful links</h6>
-                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
-                    <p><a href="frame3.html" class="text-white">Your Account</a></p>
-                    <p><a id="link" href="#myModal" class="text-white">Uploading guidelines</a></p>
-                    <p><a href="#!" class="text-white">User agreement</a></p>
-                    <p><a href="#!" class="text-white">Help</a></p>
-                </div>
-                <!-- Grid column -->
-                <!-- Grid column -->
-                <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-                    <!-- Links -->
-                    <h6 class="text-uppercase fw-bold">Contact</h6>
-                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
-                    <p><i class="bi bi-house-fill mr-3"></i> Lägerhyddsvägen 1, Uppsala 752 37, SE</p>
-                    <p><i class="bi bi-envelope-fill mr-3"></i> campus.connect@gmail.com</p>
-                    <p><i class="bi bi-phone-fill mr-3"></i> +46 12 345 67 89</p>
-                    <p><i class="bi bi-printer-fill mr-3"></i> +46 12 345 67 89</p>
-                </div>
-                <!-- Grid column -->
+          <!-- Grid row -->
+          <div class="row mt-3">
+            <!-- Grid column -->
+            <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+              <!-- Content -->
+              <h6 class="text-uppercase fw-bold">Campus Connect</h6>
+              <hr class="mb-4 mt-0 d-inline-block mx-auto"
+                style="width: 60px; background-color: #7c4dff; height: 3px" />
+              <p>Here at campus connect.......</p>
             </div>
-            <!-- Grid row -->
+            <!-- Grid column -->
+            <!-- Grid column -->
+            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+              <!-- Links -->
+              <h6 class="text-uppercase fw-bold">Useful links</h6>
+              <hr class="mb-4 mt-0 d-inline-block mx-auto"
+                style="width: 60px; background-color: #7c4dff; height: 2px" />
+              <p><a href="frame3.html" class="text-white">Your Account</a></p>
+              <p><a id="link" href="#myModal" class="text-white">Uploading guidelines</a></p>
+              <p><a href="#!" class="text-white">User agreement</a></p>
+              <p><a href="#!" class="text-white">Help</a></p>
+            </div>
+            <!-- Grid column -->
+            <!-- Grid column -->
+            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+              <!-- Links -->
+              <h6 class="text-uppercase fw-bold">Contact</h6>
+              <hr class="mb-4 mt-0 d-inline-block mx-auto"
+                style="width: 60px; background-color: #7c4dff; height: 2px" />
+              <p><i class="bi bi-house-fill mr-3"></i> Lägerhyddsvägen 1, Uppsala 752 37, SE</p>
+              <p><i class="bi bi-envelope-fill mr-3"></i> campus.connect@gmail.com</p>
+              <p><i class="bi bi-phone-fill mr-3"></i> +46 12 345 67 89</p>
+              <p><i class="bi bi-printer-fill mr-3"></i> +46 12 345 67 89</p>
+            </div>
+            <!-- Grid column -->
+          </div>
+          <!-- Grid row -->
         </div>
-    </section>
-    
+      </section>
+
       <!-- Section: Links  -->
 
       <!-- Copyright -->

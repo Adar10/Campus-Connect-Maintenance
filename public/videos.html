@@ -97,7 +97,7 @@
     }
 </style>
 
-<body class="bg-info" onload="set_name()">
+<body class="bg-info-subtle" onload="set_name()">
 
 
     <!-- Start of navbar-->
@@ -136,6 +136,7 @@
         </div>
     </nav>
 
+
     <!--LoginStatus-->
     <div class="alert alert-success" role="alert" id="alert-loggedin" style="display: none;">
         <strong>Logged in successfully!</strong>
@@ -147,7 +148,7 @@
         <strong>Logged out successfully!</strong>
     </div>
 
-    <div class="container-fluid p-5 bg-info text-white text-center">
+    <div class="container-fluid p-5 bg-info-subtle text-dark text-center">
         <h1 id="coursename">Template for navbar and footer</h1>
     </div>
 
@@ -162,21 +163,21 @@
     </script>
 
     <div class="container-fluid mt-5">
-        <div class="bg-info">
+        <div class="bg-info-subtle">
             <div class="btn-group container-fluid" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
-                <label class="btn btn-outline-light " for="btnradio1"
+                <label class="btn btn-outline-dark " for="btnradio1"
                     onclick="window.location.href='lectures.html';">Lectures</label>
 
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
-                <label class="btn btn-outline-light" for="btnradio2">Videos</label>
+                <label class="btn btn-outline-dark" for="btnradio2">Videos</label>
 
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                <label class="btn btn-outline-light" for="btnradio3"
+                <label class="btn btn-outline-dark" for="btnradio3"
                     onclick="window.location.href='quiz_menu.html';">Quizzes</label>
 
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
-                <label class="btn btn-outline-light" for="btnradio4" style="font-size: 100%;"
+                <label class="btn btn-outline-dark" for="btnradio4" style="font-size: 100%;"
                     onclick="window.location.href='exam.html';">Exams</label>
             </div>
         </div>
@@ -285,7 +286,7 @@
 
         function disableLoginButton() {
             var btn = document.getElementById('login_status');
-            btn.onclick = function(event) {
+            btn.onclick = function (event) {
                 event.preventDefault();
             }
             btn.innerHTML = "Waiting for response...";
@@ -331,9 +332,9 @@
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
-            
+
             disableLoginButton();
-            
+
             firebase.auth().signInWithPopup(provider).then(function (result) {
                 var user = result.user;
                 console.log("Signed in", user);
@@ -348,8 +349,7 @@
                 console.error(error);
                 loginFailed();
                 enableLoginButton();
-                
-                
+
                 document.getElementById("login_status").innerHTML = "Login";
             });
         }
