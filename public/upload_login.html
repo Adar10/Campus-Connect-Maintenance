@@ -304,13 +304,16 @@
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
-            
+
             disableLoginButton();
-            
+            disableUploadLoginButton();
+
+
             firebase.auth().signInWithPopup(provider).then(function (result) {
                 var user = result.user;
                 console.log("Signed in", user);
                 enableLoginButton();
+                enableUploadLoginButton();
 
                 loginSuccess();
 
@@ -321,8 +324,9 @@
                 console.error(error);
                 loginFailed();
                 enableLoginButton();
-                
-                
+                enableUploadLoginButton();
+
+
                 document.getElementById("login_status").innerHTML = "Login";
             });
         }
@@ -337,44 +341,19 @@
             });
         }
 
-      firebase.auth().signInWithPopup(provider).then(function (result) {
-        var user = result.user;
-        console.log("Signed in", user);
-        enableLoginButton();
-        enableUploadLoginButton();
-        document.getElementById("login_status").innerHTML = "Logout";
-        change();
-
-      }).catch(function (error) {
-        console.error(error);
-        enableLoginButton();
-        enableUploadLoginButton();
-
-        document.getElementById("login_status").innerHTML = "Login";
-      });
-    }
-
-    function signOutWithGoogle() {
-      firebase.auth().signOut().then(() => {
-        console.log("Signed out");
-        document.getElementById("login_status").innerHTML = "Login"
-      }).catch((error) => {
-        console.error(error);
-      });
-    }
-
     //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
     //document.getElementById('googleSignOutButton').addEventListener('click', event_logout);
 
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        console.log("User is signed in");
-        window.location.href = "upload.html";
-      } else {
-        console.log("User is signed out");
-      }
-    })
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+            console.log(user);
+            console.log("here");
+            window.location.href = "upload.html";
+          } else {
+            console.log("User is signed out");
+          }
+        })
   </script>
 
 
