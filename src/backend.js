@@ -51,7 +51,7 @@ let currentUser = null;
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    currentUser = { uid: user.uid };
+    currentUser = { uid: user.uid, umail: user.email };
     const userRef = doc(db, "users", user.uid);
 
     const updateData = {
@@ -61,6 +61,10 @@ onAuthStateChanged(auth, async (user) => {
     await setDoc(userRef, updateData, { merge: true });
 
     console.log("User data stored/updated in Firestore.");
+
+    var username = document.getElementById("displayName");
+    username.textContent = user.displayName;
+
   } else {
     currentUser = null;
     console.log("No user is signed in.");
@@ -289,3 +293,5 @@ window.storageCreateCourse = storageCreateCourse;
 
 // Expose uploadFile function globally for usage
 window.uploadFile = uploadFile;
+
+window.getCurrentUser = getCurrentUser;
