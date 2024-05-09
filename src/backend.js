@@ -121,7 +121,7 @@ export async function getCourses() {
  * @returns {Object|null} - Returns a reference to the file in Firebase Storage if it exists,
  * or null if the file does not exist or an error occurs.
  */
-async function getFileRef(courseID, category, fileName) {
+export async function getFileRef(courseID, category, fileName) {
   try {
 
     const tentaRef = ref(storage, `${courseID}/${category}/${fileName}`);

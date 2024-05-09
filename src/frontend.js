@@ -1,6 +1,7 @@
-import { getDoc, doc, setDoc, arrayUnion, updateDoc } from 'firebase/firestore';
+import { getDoc, doc, setDoc, arrayUnion ,updateDoc, deleteField} from 'firebase/firestore';
 import { getCourses, getFileDownloadURL, db, storage, getCurrentUser } from './backend.js'
-import { ref, uploadBytes } from 'firebase/storage';
+import { ref, uploadBytes, deleteObject } from 'firebase/storage';
+import { updateCurrentUser } from 'firebase/auth';
 
 /**
  * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.
@@ -565,12 +566,12 @@ async function submitFile(courseID, index) {
   const uid = user.uid;
 
   if (selectedValue == 1) {
-    await uploadFile(courseID, "Lectures", file.name, desc, file);
-    const pathString = `${courseID}/Lectures/${file.name}`;
+    await uploadFile(courseID, "Lectures", nameInput, desc, file);
+    const pathString = `${courseID}/Lectures/${nameInput}`;
     const userDocRef = doc(db, 'users', uid);
     const updateData = {
         files: {
-            [file.name]: pathString
+            [nameInput]: pathString
         }
     };
 
@@ -589,19 +590,102 @@ async function submitFile(courseID, index) {
     await setDoc(userDocRef, updateData, { merge: true });
 
 } else if (selectedValue == 3) {
-  await uploadFile(courseID, "Exams", file.name, desc, file);
-    const pathString = `${courseID}/Exams/${file.name}`;
+  await uploadFile(courseID, "Exams", nameInput, desc, file);
+    const pathString = `${courseID}/Exams/${nameInput}`;
     const userDocRef = doc(db, 'users', uid);
     const updateData = {
         files: {
-            [file.name]: pathString
+            [nameInput]: pathString
         }
     };
-
+    
     await setDoc(userDocRef, updateData, { merge: true });
 }
 
 }
+
+
+async function getDocument(user) {
+  const uid = user.uid;
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  console.log(docSnap.data());
+  return docSnap;
+}
+
+function createDeleteButton(fileName, filePath, user) {
+  const button = document.createElement('button');
+  button.textContent = 'Delete';
+  button.addEventListener('click', async () => {
+      await deleteFile(fileName, filePath);
+      renderFiles(user); 
+  });
+  return button;
+}
+
+async function deleteFile(fileName ,filePath) {
+  console.log(filePath);
+  const user = await getCurrentUser();
+  const uid = user.uid;
+  const fileRef = doc(db, "users", uid);
+  const docSnapshot = await getDoc(fileRef);
+  var userData = docSnapshot.data();
+
+  const pathsArray = filePath.split('/');
+  const courseID = pathsArray[0];
+  const category = pathsArray[1];
+  const fileToDelete = pathsArray[2];
+
+  const docRef = doc(db, courseID, category);
+
+  const updatedFiles = { ...userData.files };
+  delete updatedFiles[fileName];  
+
+  //From storage
+  const storageRef = ref(storage, `${courseID}/${category}/${fileToDelete}`);
+
+  deleteObject(storageRef).then(() => {
+    // File deleted successfully
+  }).catch((error) => {
+    // Uh-oh, an error occurred!
+  });
+  
+  try {
+    await updateDoc(docRef, {
+      [fileToDelete]: deleteField()
+    }, {merge: true} );
+
+    await updateDoc(fileRef, {
+      files: updatedFiles
+    });
+
+    console.log("Array field deleted successfully");
+  } catch (error) {
+    console.error("Error deleting array field: ", error);
+  }
+  
+}
+
+async function renderFiles(user) {
+  const filesDiv = document.getElementById('files');
+  filesDiv.innerHTML = 'Loading...';
+
+  const doc = await getDocument(user);
+  const data = doc.data();
+  const filesMap = data.files; 
+
+  filesDiv.innerHTML = '';
+  Object.keys(filesMap).forEach((fileName) => {
+      const filePath = filesMap[fileName];
+      const fileItem = document.createElement('div');
+      fileItem.classList.add('mb-3');
+      fileItem.textContent = fileName;
+      const deleteButton = createDeleteButton(fileName, filePath, user);
+      fileItem.appendChild(deleteButton);
+      filesDiv.appendChild(fileItem);
+  });
+}
+
 
 // Expose submitFile function globally for usage
 window.submitFile = submitFile;
@@ -620,6 +704,9 @@ window.generateCourseExams = generateCourseExams;
 
 // Expode generateCourseNavigation function globally for usage
 window.generateCourseNavigation = generateCourseNavigation;
+
+// Expode listFiles function globally for usage
+window.renderFiles = renderFiles;
 
 
 
