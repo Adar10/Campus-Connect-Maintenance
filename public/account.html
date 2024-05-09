@@ -245,7 +245,7 @@
     var button = document.getElementById('viewContentButton');
     button.addEventListener('click', async () => {
         const user = await getCurrentUser();
-        renderFiles(user);
+        listUserContent(user);
         button.style.display = "none";
     });
 

@@ -1,7 +1,7 @@
-import { getDoc, doc, setDoc, arrayUnion ,updateDoc, deleteField} from 'firebase/firestore';
+import { getDoc, doc, setDoc, arrayUnion, arrayRemove ,updateDoc, deleteField, deleteDoc} from 'firebase/firestore';
 import { getCourses, getFileDownloadURL, db, storage, getCurrentUser } from './backend.js'
 import { ref, uploadBytes, deleteObject } from 'firebase/storage';
-import { updateCurrentUser } from 'firebase/auth';
+
 
 /**
  * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.
@@ -604,73 +604,174 @@ async function submitFile(courseID, index) {
 
 }
 
-
-async function getDocument(user) {
+/**
+ * Fetches the document data for user
+ * @async
+ * @function
+ * @param {Object} user - The user object
+ * @returns {Promise<DocumentSnapshot>} A database document snapshot
+ */
+async function fetchDocument(user) {
   const uid = user.uid;
   const docRef = doc(db, "users", uid);
   const docSnap = await getDoc(docRef);
-  console.log(docSnap.data());
   return docSnap;
 }
 
+/**
+ * Creates a delete button with eventlistener for deletion
+ * @function
+ * @param {string} fileName - The name of file 
+ * @param {string} filePath - The path of the file
+ * @param {Object} user - The user object
+ * @returns {HTMLButtonElement} Created delete button
+ */
 function createDeleteButton(fileName, filePath, user) {
   const button = document.createElement('button');
   button.textContent = 'Delete';
   button.addEventListener('click', async () => {
-      await deleteFile(fileName, filePath);
-      renderFiles(user); 
+      await deleteContent(fileName, filePath);
+      listUserContent(user); 
   });
   return button;
 }
 
-async function deleteFile(fileName ,filePath) {
-  console.log(filePath);
+/**
+ * Deletes a quiz 
+ * @async
+ * @function
+ * @param {string} courseID - ID for the course 
+ * @param {string} quizName - The name of the quiz to delete
+ */
+async function deleteQuiz(courseID, quizName) {
+  const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
+    try {
+      await deleteDoc(quizDocRef);
+
+    } catch (error) {
+      console.error(error);
+    }
+}
+
+/**
+ * Deletes a video 
+ * @async
+ * @function
+ * @param {string} courseID - ID for the course 
+ * @param {string} category - Category of the course
+ * @param {string} filePath - The file path of the video to delete
+ */
+async function deleteVideo(courseID, category, filePath, ) {
+  const docRef = doc(db, courseID, category);
+    const docSnap = await getDoc(docRef);
+    var videoArray = docSnap.data().videos;
+    var originalVideoLink = filePath.slice(14);
+    console.log(originalVideoLink);
+
+    for(let i = 0; i < videoArray.length; i++) {
+      if(originalVideoLink === videoArray[i]) {
+        console.log(videoArray[i]);
+        await updateDoc(docRef, {
+          videos: arrayRemove(videoArray[i])
+        }); 
+        break;
+      }
+    }
+
+}
+
+/**
+ * Deletes an exam or a lecture
+ * @async
+ * @function
+ * @param {string} courseID - ID for the course 
+ * @param {string} category - Category of the course
+ * @param {string} fileToDelete - The name of the file to delete
+ */
+async function deleteExamOrLecture(courseID, category, fileToDelete) {
+  const storageRef = ref(storage, `${courseID}/${category}/${fileToDelete}`);
+    const docRef = doc(db, courseID, category);
+
+    try {
+      await updateDoc(docRef, {
+        [fileToDelete]: deleteField()
+      }, {merge: true} );
+  
+      deleteObject(storageRef);
+  
+      console.log("Array field deleted successfully");
+    } catch (error) {
+      console.error(error);
+    }
+}
+
+/**
+ * Deletes reference in database user references
+ * @async
+ * @function
+ * @param {string} fileName - Name of file to delete
+ */
+async function deleteFromReferences(fileName) {
   const user = await getCurrentUser();
   const uid = user.uid;
   const fileRef = doc(db, "users", uid);
   const docSnapshot = await getDoc(fileRef);
   var userData = docSnapshot.data();
 
+  const updatedFiles = { ...userData.files };
+  delete updatedFiles[fileName];  
+
+  try {
+    await updateDoc(fileRef, {
+      files: updatedFiles
+    });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+/**
+ * Deletes user generated content from the application and database
+ * @async
+ * @function
+ * @param {string} fileName - Name of file to delete 
+ * @param {string} filePath - The path of the file
+ */
+async function deleteContent(fileName ,filePath) {
   const pathsArray = filePath.split('/');
   const courseID = pathsArray[0];
   const category = pathsArray[1];
   const fileToDelete = pathsArray[2];
-
-  const docRef = doc(db, courseID, category);
-
-  const updatedFiles = { ...userData.files };
-  delete updatedFiles[fileName];  
-
-  //From storage
-  const storageRef = ref(storage, `${courseID}/${category}/${fileToDelete}`);
-
-  deleteObject(storageRef).then(() => {
-    // File deleted successfully
-  }).catch((error) => {
-    // Uh-oh, an error occurred!
-  });
+  const quizName = pathsArray[3];  
   
-  try {
-    await updateDoc(docRef, {
-      [fileToDelete]: deleteField()
-    }, {merge: true} );
-
-    await updateDoc(fileRef, {
-      files: updatedFiles
-    });
-
-    console.log("Array field deleted successfully");
-  } catch (error) {
-    console.error("Error deleting array field: ", error);
+  if(category === "Quizzes") {
+    //If it is quiz deletion
+    await deleteQuiz(courseID, quizName);
+  
+  } else if(category === "Videos") {
+    //If it is video deletion
+    await deleteVideo(courseID, category, filePath);
+    
+  } else {
+    // If it is exam or lecture deletion
+    await deleteExamOrLecture(courseID, category, fileToDelete);
   }
-  
+
+  //Removes from user references
+  await deleteFromReferences(fileName);
 }
 
-async function renderFiles(user) {
+/**
+ * List all content generated by the user
+ * @async
+ * @function
+ * @param {Object} user - The user object
+ */
+async function listUserContent(user) {
   const filesDiv = document.getElementById('files');
   filesDiv.innerHTML = 'Loading...';
 
-  const doc = await getDocument(user);
+  const doc = await fetchDocument(user);
   const data = doc.data();
   const filesMap = data.files; 
 
@@ -702,11 +803,11 @@ window.generateCourseLectures = generateCourseLectures;
 // Expose generateCourseExams function globally for usage
 window.generateCourseExams = generateCourseExams;
 
-// Expode generateCourseNavigation function globally for usage
+// Expose generateCourseNavigation function globally for usage
 window.generateCourseNavigation = generateCourseNavigation;
 
-// Expode listFiles function globally for usage
-window.renderFiles = renderFiles;
+// Expose listFiles function globally for usage
+window.listUserContent = listUserContent;
 
 
 
