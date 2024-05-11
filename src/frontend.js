@@ -459,6 +459,7 @@ async function selectFunction(event, file, videUrl, name, desc) {
 async function uploadFile(collectionID, category, fileName, desc, file) {
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
+    console.log(fileName);
 
     // Upload the file and wait for the promise to resolve
     const uploadResult = await uploadBytes(storageRef, file);
@@ -568,7 +569,7 @@ async function submitFile(courseID, index) {
 
   if (selectedValue == 1) {
     let exists = true;
-    let count = 1;
+    let count = 2;
     
     while (exists) {
       const fileRef = ref(storage, `${courseID}/Lectures/${nameInput}`);
@@ -576,7 +577,7 @@ async function submitFile(courseID, index) {
         // Try to get the download URL to check if the file exists
         await getDownloadURL(fileRef);
         // If success, file exists, append number to filename
-        nameInput = `${baseNameInput}[${count}]`;
+        nameInput = `${baseNameInput}(${count})`;
         count += 1;
       } catch (error) {
         // If error (file does not exist), break the loop
@@ -594,7 +595,7 @@ async function submitFile(courseID, index) {
     const userDocRef = doc(db, 'users', uid);
     const updateData = {
         files: {
-            [nameInput]: pathString
+            [courseID+'/Lectures/'+nameInput]: pathString
         }
     };
 
@@ -614,7 +615,7 @@ async function submitFile(courseID, index) {
 
 } else if (selectedValue == 3) {
     let exists = true;
-    let count = 1;
+    let count = 2;
     
     while (exists) {
       const fileRef = ref(storage, `${courseID}/Exams/${nameInput}`);
@@ -622,7 +623,7 @@ async function submitFile(courseID, index) {
         // Try to get the download URL to check if the file exists
         await getDownloadURL(fileRef);
         // If success, file exists, append number to filename
-        nameInput = `${baseNameInput}[${count}]`;
+        nameInput = `${baseNameInput}(${count})`;
         count += 1;
       } catch (error) {
         // If error (file does not exist), break the loop
@@ -640,7 +641,7 @@ async function submitFile(courseID, index) {
     const userDocRef = doc(db, 'users', uid);
     const updateData = {
         files: {
-            [nameInput]: pathString
+            [courseID+'/Exams/'+nameInput]: pathString
         }
     };
     
