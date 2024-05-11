@@ -1,6 +1,7 @@
-import { getDoc, doc, setDoc, arrayUnion, updateDoc } from 'firebase/firestore';
-import { getCourses, getFileDownloadURL, db, storage } from './backend.js'
-import { ref, uploadBytes } from 'firebase/storage';
+import { getDoc, doc, setDoc, arrayUnion, arrayRemove ,updateDoc, deleteField, deleteDoc} from 'firebase/firestore';
+import { getCourses, getFileDownloadURL, db, storage, getCurrentUser } from './backend.js'
+import { ref, uploadBytes, deleteObject } from 'firebase/storage';
+
 
 /**
  * Asynchronously generates navigation elements for available courses and appends them to the designated navigation element in the DOM.
@@ -313,7 +314,8 @@ async function generateUpload() {
   const courses = await getCourses();
   const div_start = document.getElementById("upload");
 
-  courses.forEach(course => {
+  courses.forEach((course, index) => {
+    
     const card_container = document.createElement("div");
     card_container.classList.add("card", "container", "mt-5")
     card_container.style.width = "20rem";
@@ -326,13 +328,13 @@ async function generateUpload() {
 
     const file = document.createElement("input");
     file.classList.add("form-control");
-    file.id = "formFileLg";
+    file.id = "formFileLg" + index;
     file.type = "file";
     file.style.visibility = "hidden";
 
     const fileName = document.createElement("input");
     fileName.classList.add("form-control");
-    fileName.id = "fileName";
+    fileName.id = "fileName" + index;
     fileName.type = "text";
     fileName.placeholder = "Name of file";
     fileName.style.visibility = "hidden";
@@ -340,7 +342,7 @@ async function generateUpload() {
 
     const fileDesc = document.createElement("input");
     fileDesc.classList.add("form-control");
-    fileDesc.id = "fileDesc";
+    fileDesc.id = "fileDesc" + index;
     fileDesc.type = "text"
     fileDesc.placeholder = "Description of file";
     fileDesc.style.visibility = "hidden";
@@ -348,7 +350,7 @@ async function generateUpload() {
 
     const videoUrl = document.createElement("input");
     videoUrl.classList.add("form-control");
-    videoUrl.id = "videoUrl";
+    videoUrl.id = "videoUrl" + index;
     videoUrl.type = "text";
     videoUrl.placeholder = "Embedded video link"
     videoUrl.style.visibility = "hidden";
@@ -359,7 +361,7 @@ async function generateUpload() {
 
     const select = document.createElement("select");
     select.classList.add("custom-select");
-    select.id = "inputGroupSelect04";
+    select.id = "inputGroupSelect04" + index;
     select.style.flex = "1";
 
 
@@ -388,15 +390,13 @@ async function generateUpload() {
     btn.textContent = "Submit";
     btn.addEventListener('click', async () => {
       try {
-        submitFile(course.ID);
+        submitFile(course.ID, index);
       } catch (error) {
         console.error("Error getting download URL:", error);
       }
     });
 
     select.addEventListener('change', (event) => selectFunction(event, file, videoUrl, fileName, fileDesc));
-
-
 
 
     div_start.appendChild(card_container);
@@ -457,19 +457,29 @@ async function selectFunction(event, file, videUrl, name, desc) {
 * @param {File} file - The file object selected by the user.
 */
 async function uploadFile(collectionID, category, fileName, desc, file) {
-
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
-    addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc, 0);
-    await uploadBytes(storageRef, file).then((snapshot) => {
-      console.log("Uploaded file succesfully");
-      document.getElementById("alert").style.display = "block";
-      setTimeout(function () {
+
+    // Upload the file and wait for the promise to resolve
+    const uploadResult = await uploadBytes(storageRef, file);
+    console.log("Uploaded file successfully");
+
+    // Update Firestore after the file has been uploaded
+    await addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc, 0);
+    console.log("Firestore document updated");
+
+    // Display the alert and return a resolved promise after the alert hides
+    document.getElementById("alert").style.display = "block";
+    return new Promise(resolve => {
+      setTimeout(() => {
         document.getElementById("alert").style.display = "none";
+        resolve(uploadResult);
       }, 2000);
     });
+
   } catch (error) {
     console.error("Error uploading file:", error);
+    throw error; // Make sure to throw the error to ensure it can be caught by the caller
   }
 }
 
@@ -477,20 +487,34 @@ async function uploadVideos(collectionID, category, URL) {
   try {
     const docRef = doc(db, collectionID, "Videos");
     const snapshot = await getDoc(docRef);
-    var array = snapshot.data().videos;
-    console.log(array[0]);
+
+    // Ensure the document exists and has the correct structure
+    if (!snapshot.exists()) {
+      throw new Error('Document does not exist!');
+    }
+
+    var array = snapshot.data().videos || []; // Ensure the array exists
+    console.log(array[0]); // Just to debug
+
+    // Update the document with new video URL
     await updateDoc(docRef, {
       videos: arrayUnion(URL)
     });
     console.log("Video uploaded");
+
+    // Display the alert and return a resolved promise after the alert hides
     document.getElementById("alert").style.display = "block";
-    setTimeout(function () {
-      document.getElementById("alert").style.display = "none";
-    }, 2000);
+    return new Promise(resolve => {
+      setTimeout(() => {
+        document.getElementById("alert").style.display = "none";
+        resolve("Video updated successfully.");
+      }, 2000);
+    });
+
   } catch (error) {
     console.error("Error uploading video", error);
+    throw error; // Propagate the error
   }
-
 }
 
 /**
@@ -524,28 +548,245 @@ async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, 
  * @function
  * @param {string} courseID - The course ID 
  */
-async function submitFile(courseID) {
+async function submitFile(courseID, index) {
   // Get the file input element
-  var fileInput = document.getElementById('formFileLg');
-  var nameInput = document.getElementById('fileName').value;
-  var desc = document.getElementById('fileDesc').value;
-  var videoUrl = document.getElementById("videoUrl").value;
+  var fileInput = document.getElementById('formFileLg' + index);
+  var nameInput = document.getElementById('fileName'+ index).value;
+  var desc = document.getElementById('fileDesc'+ index).value;
+  var videoUrl = document.getElementById("videoUrl" + index).value;
 
   // Get the selected file
   var file = fileInput.files[0];
 
   // Get the selected value from the dropdown
-  var selectElement = document.getElementById('inputGroupSelect04');
+  var selectElement = document.getElementById('inputGroupSelect04' + index);
   var selectedValue = selectElement.value;
 
+  const user = await getCurrentUser();
+  const uid = user.uid;
+
   if (selectedValue == 1) {
-    uploadFile(courseID, "Lectures", file.name, desc, file);
-  } else if (selectedValue == 2) {
-    uploadVideos(courseID, "Videos", videoUrl);
-  } else if (selectedValue == 3) {
-    uploadFile(courseID, "Exams", file.name, desc, file);
+    await uploadFile(courseID, "Lectures", nameInput, desc, file);
+    const pathString = `${courseID}/Lectures/${nameInput}`;
+    const userDocRef = doc(db, 'users', uid);
+    const updateData = {
+        files: {
+            [nameInput]: pathString
+        }
+    };
+
+    await setDoc(userDocRef, updateData, { merge: true });
+
+} else if (selectedValue == 2) {
+  await uploadVideos(courseID, "Videos", videoUrl);
+    const pathString = `${courseID}/Videos/${videoUrl}`;
+    const userDocRef = doc(db, 'users', uid);
+    const updateData = {
+        files: {
+            [videoUrl]: pathString
+        }
+    };
+
+    await setDoc(userDocRef, updateData, { merge: true });
+
+} else if (selectedValue == 3) {
+  await uploadFile(courseID, "Exams", nameInput, desc, file);
+    const pathString = `${courseID}/Exams/${nameInput}`;
+    const userDocRef = doc(db, 'users', uid);
+    const updateData = {
+        files: {
+            [nameInput]: pathString
+        }
+    };
+    
+    await setDoc(userDocRef, updateData, { merge: true });
+}
+
+}
+
+/**
+ * Fetches the document data for user
+ * @async
+ * @function
+ * @param {Object} user - The user object
+ * @returns {Promise<DocumentSnapshot>} A database document snapshot
+ */
+async function fetchDocument(user) {
+  const uid = user.uid;
+  const docRef = doc(db, "users", uid);
+  const docSnap = await getDoc(docRef);
+  return docSnap;
+}
+
+/**
+ * Creates a delete button with eventlistener for deletion
+ * @function
+ * @param {string} fileName - The name of file 
+ * @param {string} filePath - The path of the file
+ * @param {Object} user - The user object
+ * @returns {HTMLButtonElement} Created delete button
+ */
+function createDeleteButton(fileName, filePath, user) {
+  const button = document.createElement('button');
+  button.textContent = 'Delete';
+  button.addEventListener('click', async () => {
+      await deleteContent(fileName, filePath);
+      listUserContent(user); 
+  });
+  return button;
+}
+
+/**
+ * Deletes a quiz 
+ * @async
+ * @function
+ * @param {string} courseID - ID for the course 
+ * @param {string} quizName - The name of the quiz to delete
+ */
+async function deleteQuiz(courseID, quizName) {
+  const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
+    try {
+      await deleteDoc(quizDocRef);
+
+    } catch (error) {
+      console.error(error);
+    }
+}
+
+/**
+ * Deletes a video 
+ * @async
+ * @function
+ * @param {string} courseID - ID for the course 
+ * @param {string} category - Category of the course
+ * @param {string} filePath - The file path of the video to delete
+ */
+async function deleteVideo(courseID, category, filePath, ) {
+  const docRef = doc(db, courseID, category);
+    const docSnap = await getDoc(docRef);
+    var videoArray = docSnap.data().videos;
+    var originalVideoLink = filePath.slice(14);
+    console.log(originalVideoLink);
+
+    for(let i = 0; i < videoArray.length; i++) {
+      if(originalVideoLink === videoArray[i]) {
+        console.log(videoArray[i]);
+        await updateDoc(docRef, {
+          videos: arrayRemove(videoArray[i])
+        }); 
+        break;
+      }
+    }
+
+}
+
+/**
+ * Deletes an exam or a lecture
+ * @async
+ * @function
+ * @param {string} courseID - ID for the course 
+ * @param {string} category - Category of the course
+ * @param {string} fileToDelete - The name of the file to delete
+ */
+async function deleteExamOrLecture(courseID, category, fileToDelete) {
+  const storageRef = ref(storage, `${courseID}/${category}/${fileToDelete}`);
+    const docRef = doc(db, courseID, category);
+
+    try {
+      await updateDoc(docRef, {
+        [fileToDelete]: deleteField()
+      }, {merge: true} );
+  
+      deleteObject(storageRef);
+  
+      console.log("Array field deleted successfully");
+    } catch (error) {
+      console.error(error);
+    }
+}
+
+/**
+ * Deletes reference in database user references
+ * @async
+ * @function
+ * @param {string} fileName - Name of file to delete
+ */
+async function deleteFromReferences(fileName) {
+  const user = await getCurrentUser();
+  const uid = user.uid;
+  const fileRef = doc(db, "users", uid);
+  const docSnapshot = await getDoc(fileRef);
+  var userData = docSnapshot.data();
+
+  const updatedFiles = { ...userData.files };
+  delete updatedFiles[fileName];  
+
+  try {
+    await updateDoc(fileRef, {
+      files: updatedFiles
+    });
+  } catch (error) {
+    console.error(error);
   }
 }
+
+/**
+ * Deletes user generated content from the application and database
+ * @async
+ * @function
+ * @param {string} fileName - Name of file to delete 
+ * @param {string} filePath - The path of the file
+ */
+async function deleteContent(fileName ,filePath) {
+  const pathsArray = filePath.split('/');
+  const courseID = pathsArray[0];
+  const category = pathsArray[1];
+  const fileToDelete = pathsArray[2];
+  const quizName = pathsArray[3];  
+  
+  if(category === "Quizzes") {
+    //If it is quiz deletion
+    await deleteQuiz(courseID, quizName);
+  
+  } else if(category === "Videos") {
+    //If it is video deletion
+    await deleteVideo(courseID, category, filePath);
+    
+  } else {
+    // If it is exam or lecture deletion
+    await deleteExamOrLecture(courseID, category, fileToDelete);
+  }
+
+  //Removes from user references
+  await deleteFromReferences(fileName);
+}
+
+/**
+ * List all content generated by the user
+ * @async
+ * @function
+ * @param {Object} user - The user object
+ */
+async function listUserContent(user) {
+  const filesDiv = document.getElementById('files');
+  filesDiv.innerHTML = 'Loading...';
+
+  const doc = await fetchDocument(user);
+  const data = doc.data();
+  const filesMap = data.files; 
+
+  filesDiv.innerHTML = '';
+  Object.keys(filesMap).forEach((fileName) => {
+      const filePath = filesMap[fileName];
+      const fileItem = document.createElement('div');
+      fileItem.classList.add('mb-3');
+      fileItem.textContent = fileName;
+      const deleteButton = createDeleteButton(fileName, filePath, user);
+      fileItem.appendChild(deleteButton);
+      filesDiv.appendChild(fileItem);
+  });
+}
+
 
 // Expose submitFile function globally for usage
 window.submitFile = submitFile;
@@ -562,8 +803,11 @@ window.generateCourseLectures = generateCourseLectures;
 // Expose generateCourseExams function globally for usage
 window.generateCourseExams = generateCourseExams;
 
-// Expode generateCourseNavigation function globally for usage
+// Expose generateCourseNavigation function globally for usage
 window.generateCourseNavigation = generateCourseNavigation;
+
+// Expose listFiles function globally for usage
+window.listUserContent = listUserContent;
 
 
 

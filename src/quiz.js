@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, getDoc, arrayUnion } from "firebase/firestore";
 
-import { db } from './backend.js';
+import { db, getCurrentUser } from './backend.js';
 
 
 // DOM elements
@@ -46,12 +46,27 @@ async function createQuiz() {
         errorMessageElement.hidden;
         const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
         await setDoc(quizDocRef, {
-            questions: []
+            questions: [],
+            likes: 0
         });
         $('#questions-container').show();
         $('#quiz-name').hide();
         $('#submit-name-btn').hide();
         console.log("Document successfully created");
+
+        const user = await getCurrentUser();
+        const uid = user.uid;
+
+        const pathString = `${courseID}/Quizzes/all-quizzes/${quizName}`;
+
+        const userDocRef = doc(db, 'users', uid);
+        const updateData = {
+            files: {
+                [quizName]: pathString
+            }
+        };
+
+        await setDoc(userDocRef, updateData, { merge: true });
     }
 }
 
@@ -87,7 +102,6 @@ async function addQuizQuestions() {
 
         await updateDoc(quizDocRef, {
             questions: arrayUnion(newQuestion),
-             likes: 0
         });
 
         // Clear question inputs

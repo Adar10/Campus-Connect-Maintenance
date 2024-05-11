@@ -120,6 +120,7 @@
         background-color: rgba(0, 0, 0, 0.4);
         /* Black w/ opacity */
     }
+    
 
     /* Modal Content */
     .modal-content {
@@ -222,7 +223,7 @@
 
     <div class="jumbotron jumbotron-fluid bg-light border border-4 border-dark">
         <div class="container">
-            <h1 class="display-4" id="displayName">username</h1>
+            <h1 class="display-4" id="displayName"></h1>
             <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-profiles/avatar-2.webp"
                 alt="Generic placeholder image" class="img-fluid rounded-circle border border-dark border-3"
                 style="width: 70px;">
@@ -231,6 +232,24 @@
     </div>
 
 
+    <!--Account content and deletion-->
+    <div class="container-fluid">
+        <h1 class="text-center">Your Content</h1>
+        <div id="files" class="mt-4">
+            <p class="text-center">Content will be listed here...</p>
+        </div>
+        <button id="viewContentButton" style="display: block; margin: 0 auto;">View Content</button>        
+    </div>
+
+    <script>
+    var button = document.getElementById('viewContentButton');
+    button.addEventListener('click', async () => {
+        const user = await getCurrentUser();
+        listUserContent(user);
+        button.style.display = "none";
+    });
+
+    </script>
 
     <script>
         var firebaseConfig = {
@@ -247,6 +266,8 @@
     </script>
 
     <script>
+        
+
         function createoncefunction() {
             let hasbeencalled = false;
             return function () {
@@ -395,14 +416,14 @@
                 console.log("User is signed in");
             } else {
                 console.log("User is signed out");
+                window.location.href = "account_login.html";
             }
         })
+
+
+        
+
     </script>
-
-
-
-
-
 
     <!--Start of footer-->
     <div class="container-fluid ">
