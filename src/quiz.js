@@ -46,7 +46,8 @@ async function createQuiz() {
         errorMessageElement.hidden;
         const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
         await setDoc(quizDocRef, {
-            questions: []
+            questions: [],
+            likes: 0
         });
         $('#questions-container').show();
         $('#quiz-name').hide();
@@ -101,7 +102,6 @@ async function addQuizQuestions() {
 
         await updateDoc(quizDocRef, {
             questions: arrayUnion(newQuestion),
-            likes: 0
         });
 
         // Clear question inputs
