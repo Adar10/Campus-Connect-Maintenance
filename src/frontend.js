@@ -1,6 +1,6 @@
 import { getDoc, doc, setDoc, arrayUnion, arrayRemove ,updateDoc, deleteField, deleteDoc} from 'firebase/firestore';
 import { getCourses, getFileDownloadURL, db, storage, getCurrentUser } from './backend.js'
-import { ref, uploadBytes, deleteObject } from 'firebase/storage';
+import { ref, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
 
 
 /**
@@ -459,6 +459,7 @@ async function selectFunction(event, file, videUrl, name, desc) {
 async function uploadFile(collectionID, category, fileName, desc, file) {
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
+    console.log(fileName);
 
     // Upload the file and wait for the promise to resolve
     const uploadResult = await uploadBytes(storageRef, file);
@@ -551,9 +552,10 @@ async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, 
 async function submitFile(courseID, index) {
   // Get the file input element
   var fileInput = document.getElementById('formFileLg' + index);
-  var nameInput = document.getElementById('fileName'+ index).value;
+  var baseNameInput = document.getElementById('fileName'+ index).value;
   var desc = document.getElementById('fileDesc'+ index).value;
   var videoUrl = document.getElementById("videoUrl" + index).value;
+  let nameInput = baseNameInput;
 
   // Get the selected file
   var file = fileInput.files[0];
@@ -566,12 +568,34 @@ async function submitFile(courseID, index) {
   const uid = user.uid;
 
   if (selectedValue == 1) {
+    let exists = true;
+    let count = 2;
+    
+    while (exists) {
+      const fileRef = ref(storage, `${courseID}/Lectures/${nameInput}`);
+      try {
+        // Try to get the download URL to check if the file exists
+        await getDownloadURL(fileRef);
+        // If success, file exists, append number to filename
+        nameInput = `${baseNameInput}(${count})`;
+        count += 1;
+      } catch (error) {
+        // If error (file does not exist), break the loop
+        if (error.code === 'storage/object-not-found') {
+          exists = false; // Set exists to false to break the loop
+        } else {
+          // Handle other errors (e.g., permission issues)
+          console.error('Error accessing storage:', error);
+          throw error;
+        }
+      }
+    }
     await uploadFile(courseID, "Lectures", nameInput, desc, file);
     const pathString = `${courseID}/Lectures/${nameInput}`;
     const userDocRef = doc(db, 'users', uid);
     const updateData = {
         files: {
-            [nameInput]: pathString
+            [courseID+'/Lectures/'+nameInput]: pathString
         }
     };
 
@@ -590,12 +614,34 @@ async function submitFile(courseID, index) {
     await setDoc(userDocRef, updateData, { merge: true });
 
 } else if (selectedValue == 3) {
+    let exists = true;
+    let count = 2;
+    
+    while (exists) {
+      const fileRef = ref(storage, `${courseID}/Exams/${nameInput}`);
+      try {
+        // Try to get the download URL to check if the file exists
+        await getDownloadURL(fileRef);
+        // If success, file exists, append number to filename
+        nameInput = `${baseNameInput}(${count})`;
+        count += 1;
+      } catch (error) {
+        // If error (file does not exist), break the loop
+        if (error.code === 'storage/object-not-found') {
+          exists = false; // Set exists to false to break the loop
+        } else {
+          // Handle other errors (e.g., permission issues)
+          console.error('Error accessing storage:', error);
+          throw error;
+        }
+      }
+    }
   await uploadFile(courseID, "Exams", nameInput, desc, file);
     const pathString = `${courseID}/Exams/${nameInput}`;
     const userDocRef = doc(db, 'users', uid);
     const updateData = {
         files: {
-            [nameInput]: pathString
+            [courseID+'/Exams/'+nameInput]: pathString
         }
     };
     
