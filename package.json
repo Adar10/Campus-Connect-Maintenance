@@ -2,7 +2,7 @@
   "dependencies": {
     "babel": "^6.23.0",
     "firebase": "^10.9.0",
-    "firebase-tools": "^13.7.2",
+    "firebase-tools": "^13.35.1",
     "jsdoc": "^4.0.2"
   },
   "name": "campus-connect",
