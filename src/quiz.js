@@ -1,5 +1,4 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc, count, getDoc, arrayUnion } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc, updateDoc, getDoc, arrayUnion } from "firebase/firestore";
 
 import { db, getCurrentUser } from './backend.js';
 
@@ -345,7 +344,6 @@ async function fetchQuiz(quizID) {
 }
 
 
-let currentQuestionIndex = 0;   //Position of the current question
 let questionNumber = 1;   //Enumerates questions in order of quiz
 let score = 0;   //Final score for current quiz
 let allQuestionlength = 0;   //length of all questions
@@ -364,7 +362,6 @@ async function startQuiz(quizID) {
 
     let quizQuestion = await fetchQuiz(quizID);
     questionNumber = 1;
-    currentQuestionIndex = 0;
     score = 0;
     allQuestionlength = quizQuestion.length;
     ID = quizID;
@@ -470,21 +467,6 @@ function showScore() {
         window.location.href = "quiz_menu.html";
     });
 }
-
-
-/**
-* Handles the "Next" button functionality during the quiz.
-* 
-* @function handleNextButton
-* @returns {void} This function updates the current question index and checks if the quiz is complete to show the final score.
-*/
-function handleNextButton() {
-    currentQuestionIndex++
-    if (currentQuestionIndex > allQuestionlength) {
-        showScore();
-    }
-}
-
 
 //Assigning functions to global variables for ease of access
 

@@ -5,14 +5,16 @@
 * @returns {Object} The initialized Firebase app.
 */
 import { initializeApp } from 'firebase/app';
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 /**
  * Gets the Firestore database instance.
  * @function
  * @returns {Object} The Firestore database instance.
  */
-import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, setDoc } from 'firebase/firestore';
+// Unused imports
+// import { query, where, updateDoc, deleteDoc } from 'firebase/firestore';
 
 
 /**
@@ -20,7 +22,7 @@ import { getFirestore, collection, addDoc, getDocs, query, where, doc, setDoc, u
  * @function
  * @returns {Object} The Firestore storage instance.
  */
-import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage'
+import { getStorage, ref, getDownloadURL, uploadString, uploadBytes } from 'firebase/storage'
 
 // Firebase configuration object
 const firebaseConfig = {
@@ -149,7 +151,7 @@ async function uploadFile(collectionID, category, fileName, desc, file) {
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
     addArrayFieldToDocument(collectionID, category, fileName, `${collectionID}/${category}/${fileName}`, desc);
-    await uploadBytes(storageRef, file).then((snapshot) => {
+    await uploadBytes(storageRef, file).then(() => {
       console.log("Uploaded file succesfully");
     });
   } catch (error) {
@@ -228,59 +230,62 @@ async function createDocument(collectionName, data) {
   }
 }
 
-/**
- * Updates an existing document in the specified collection.
- * @async
- * @function
- * @param {string} collectionName - The name of the collection.
- * @param {string} docId - The ID of the document to be updated.
- * @param {Object} data - The updated data for the document.
- */
-async function updateDocument(collectionName, docId, data) {
-  try {
-    const washingtonRef = doc(db, collectionName, docId);
-    await updateDoc(washingtonRef, data);
-    console.log("Update completed");
-  } catch (error) {
-    console.error("Error updating: ", error);
-  }
-}
+// Commenting the functions below out, as they are not directly used in the current codebase.
+// However, if these functions are actually useful, they can be uncommented and used as needed.
 
-/**
- * Reads documents from the specified collection based on a specific field and value.
- * @async
- * @function
- * @param {string} collectionName - The name of the collection.
- * @param {string} field - The field to filter documents by.
- * @param {any} value - The value to filter documents by.
- */
-async function readDocuments(collectionName, field, value) {
-  try {
-    const q = query(collection(db, collectionName), where(field, "==", value));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.id);
-    });
-  } catch (error) {
-    console.error("Error reading: ", error);
-  }
-}
+// /**
+//  * Updates an existing document in the specified collection.
+//  * @async
+//  * @function
+//  * @param {string} collectionName - The name of the collection.
+//  * @param {string} docId - The ID of the document to be updated.
+//  * @param {Object} data - The updated data for the document.
+//  */
+// async function updateDocument(collectionName, docId, data) {
+//   try {
+//     const washingtonRef = doc(db, collectionName, docId);
+//     await updateDoc(washingtonRef, data);
+//     console.log("Update completed");
+//   } catch (error) {
+//     console.error("Error updating: ", error);
+//   }
+// }
 
-/**
- * Deletes a document from the specified collection.
- * @async
- * @function
- * @param {string} collectionName - The name of the collection.
- * @param {string} docId - The ID of the document to be deleted.
- */
-async function deleteDocument(collectionName, docId) {
-  try {
-    await deleteDoc(doc(db, collectionName, docId));
-    console.log("Deletion completed");
-  } catch (error) {
-    console.error("Error deleting: ", error);
-  }
-}
+// /**
+//  * Reads documents from the specified collection based on a specific field and value.
+//  * @async
+//  * @function
+//  * @param {string} collectionName - The name of the collection.
+//  * @param {string} field - The field to filter documents by.
+//  * @param {any} value - The value to filter documents by.
+//  */
+// async function readDocuments(collectionName, field, value) {
+//   try {
+//     const q = query(collection(db, collectionName), where(field, "==", value));
+//     const querySnapshot = await getDocs(q);
+//     querySnapshot.forEach((doc) => {
+//       console.log(doc.id);
+//     });
+//   } catch (error) {
+//     console.error("Error reading: ", error);
+//   }
+// }
+
+// /**
+//  * Deletes a document from the specified collection.
+//  * @async
+//  * @function
+//  * @param {string} collectionName - The name of the collection.
+//  * @param {string} docId - The ID of the document to be deleted.
+//  */
+// async function deleteDocument(collectionName, docId) {
+//   try {
+//     await deleteDoc(doc(db, collectionName, docId));
+//     console.log("Deletion completed");
+//   } catch (error) {
+//     console.error("Error deleting: ", error);
+//   }
+// }
 
 // Expose createDocument function globally for usage
 window.createDocument = createDocument;

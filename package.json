@@ -14,10 +14,14 @@
     "@babel/preset-env": "^7.24.4",
     "@babel/preset-flow": "^7.24.1",
     "@babel/preset-react": "^7.24.1",
+    "@eslint/js": "^10.0.1",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^29.7.0",
     "babel-plugin-styled-components": "^2.1.4",
+    "concurrently": "^10.0.5",
+    "eslint": "^10.10.0",
     "firebase-mock": "^2.2.4",
+    "globals": "^17.12.0",
     "jest": "^27.5.1",
     "webpack-cli": "^5.1.4"
   },
@@ -37,5 +41,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "allowScripts": {
+    "protobufjs@7.6.6": true,
+    "re2@1.26.1": true
+  }
 }
