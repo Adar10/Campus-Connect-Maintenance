@@ -20,7 +20,7 @@ const nextButton = document.getElementById("next-btn");
  * @returns {Promise<void>} A promise that resolves once the quiz is created of if it already exists, resolves without creating a duplicate.
  * @throws {Error} If there is an error creating or checking for the quiz in the database.
  */
-async function createQuiz() {
+export async function createQuiz() {
     var courseID = localStorage.getItem("ID");
     var quizName = document.getElementById("quiz-name").value;
 
@@ -78,7 +78,7 @@ async function createQuiz() {
  * @returns {Promise<void>} A promise that resolves once all questions are added to the quiz document.
  * @throws {Error} If there is an error adding questions to the quiz document. 
  */
-async function addQuizQuestions() {
+export async function addQuizQuestions() {
     var courseID = localStorage.getItem("ID");
     var quizName = document.getElementById("quiz-name").value;
     const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
@@ -128,7 +128,7 @@ async function addQuizQuestions() {
  * @returns {void} This function doesn't return a value directly, but fetches and displays quiz buttons asynchronously.
  * @throws {Error} If there is an error fetching or processing quiz data from the database.
  */
-function getAllQuizzes() {
+export function getAllQuizzes() {
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
 
@@ -213,7 +213,7 @@ function getAllQuizzes() {
  * @param {string} quizID - The name of the quiz
  * @returns {void} This function do not return anything 
  */
-async function uppdateLikes(count, quizID) {
+export async function uppdateLikes(count, quizID) {
     //Retrieve the course id from localStorage
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
@@ -246,7 +246,7 @@ async function uppdateLikes(count, quizID) {
  * @param {string} quizID - The name of the quiz
  * @returns {number} - returns the number of likes
  */
-async function getLikeFromQuiz(quizID) {
+export async function getLikeFromQuiz(quizID) {
 
     //Retrieve the course id from localStorage
     var courseID = localStorage.getItem("ID");
@@ -279,7 +279,7 @@ async function getLikeFromQuiz(quizID) {
  * @param {Array} array - The array to be shuffled
  * @returns {void} This function shuffles the array in place and does not return a new array. 
  */
-function shuffleArray(array) {
+export function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
@@ -296,7 +296,7 @@ function shuffleArray(array) {
  * @returns {Promise<Array<Object>>} A promise that resolves with an array of objects representing quiz questions.
  * @throws {Error} If there is an error in fetching the quiz or processing the data.
  */
-async function fetchQuiz(quizID) {
+export async function fetchQuiz(quizID) {
     //Retrieve the course id from localStorage
     var courseID = localStorage.getItem("ID");
     console.log(courseID);
@@ -358,7 +358,7 @@ let questions = [];   //Array with all questions
 * @returns {void} This function displays quiz questions and manages the quiz flow asynchronously.
 * @throws {Error} If there is an error fetching or processing quiz questions.
 */
-async function startQuiz(quizID) {
+export async function startQuiz(quizID) {
 
     let quizQuestion = await fetchQuiz(quizID);
     questionNumber = 1;
@@ -389,7 +389,7 @@ async function startQuiz(quizID) {
 * @param {Object} arr - An object containing the current question and it's answer options.
 * @returns {void} This function updates the DOM to show the current questions and answer options.
 */
-function showQuestion(arr) {
+export function showQuestion(arr) {
     resetState();
     let currentQuestions = arr;
     let questionNo = questionNumber++;
@@ -414,7 +414,7 @@ function showQuestion(arr) {
 * @function resetState
 * @returns {void} This function updates the DOM to reset the quiz state. 
 */
-function resetState() {
+export function resetState() {
     nextButton.style.display = "none";
     while (answerButtons.firstChild) {
         answerButtons.removeChild(answerButtons.firstChild);
@@ -429,7 +429,7 @@ function resetState() {
 * @param {Event} e - The event object representing the click event on an answer button.
 * @returns {void} This function updates the DOM to reflect the user's answer selection and enables the next button.  
 */
-function selectAnswer(e) {
+export function selectAnswer(e) {
     const selectedBtn = e.target;
 
     const isCorrect = selectedBtn.innerHTML === questions.correctAnswer;
@@ -456,7 +456,7 @@ function selectAnswer(e) {
 * @function showScore
 * @returns {void} This function updates the DOM to show the user's final score and provides options to quit or return to the quiz menu. 
 */
-function showScore() {
+export function showScore() {
     resetState();
     questionElem.innerHTML = `You scored ${score} out of ${allQuestionlength}!`;
     nextButton.innerHTML = "Quit";

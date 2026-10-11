@@ -11,7 +11,7 @@ import { ref, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage
  * @function generateCourseNavigation
  * @returns {Promise<void>} Does not explicitly return a value; results in side effects in the DOM and localStorage.
  */
-async function generateCourseNavigation() {
+export async function generateCourseNavigation() {
   const courses = await getCourses();
   console.log(courses);
   const nav = document.getElementById("navigation");
@@ -55,7 +55,7 @@ async function generateCourseNavigation() {
  * @function generateCourseExams
  * @returns {Promise<void>} Executes asynchronous operations and manipulates the DOM, but returns no value.
  */
-async function generateCourseExams() {
+export async function generateCourseExams() {
 
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
@@ -147,7 +147,7 @@ async function generateCourseExams() {
  * @returns {Promise<void>} Does not return a value but performs DOM manipulations and might open new browser tabs based on user interaction.
  */
 
-async function generateCourseLectures() {
+export async function generateCourseLectures() {
 
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
@@ -234,7 +234,7 @@ async function generateCourseLectures() {
 
 }
 
-async function generateCourseVideos() {
+export async function generateCourseVideos() {
 
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
@@ -282,7 +282,7 @@ async function generateCourseVideos() {
 * @param {string} document - The course document to enter
 * @param {string} name - Name of the wanted field 
 */
-async function getLikeCount(document, name) {
+export async function getLikeCount(document, name) {
 
   var courseID = localStorage.getItem("ID");
   console.log(courseID);
@@ -310,7 +310,7 @@ async function getLikeCount(document, name) {
   }
 }
 
-async function generateUpload() {
+export async function generateUpload() {
   const courses = await getCourses();
   const div_start = document.getElementById("upload");
 
@@ -419,7 +419,7 @@ async function generateUpload() {
   });
 }
 
-async function selectFunction(event, file, videUrl, name, desc) {
+export async function selectFunction(event, file, videUrl, name, desc) {
   const select = event.target;
   const option = select.value;
 
@@ -456,7 +456,7 @@ async function selectFunction(event, file, videUrl, name, desc) {
 * @param {string} desc - The file description.
 * @param {File} file - The file object selected by the user.
 */
-async function uploadFile(collectionID, category, fileName, desc, file) {
+export async function uploadFile(collectionID, category, fileName, desc, file) {
   try {
     const storageRef = ref(storage, `${collectionID}/${category}/${fileName}`);
     console.log(fileName);
@@ -484,7 +484,7 @@ async function uploadFile(collectionID, category, fileName, desc, file) {
   }
 }
 
-async function uploadVideos(collectionID, category, URL) {
+export async function uploadVideos(collectionID, category, URL) {
   try {
     const docRef = doc(db, collectionID, "Videos");
     const snapshot = await getDoc(docRef);
@@ -529,7 +529,7 @@ async function uploadVideos(collectionID, category, URL) {
  * @param {string} fieldValue3 - Array index 2 value.
  * @param {string} fieldValue4 - Array index 3 value.
  */
-async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3, fieldValue4) {
+export async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, fieldValue2, fieldValue3, fieldValue4) {
   try {
     const docRef = doc(db, collectionID, documentName);
     await setDoc(docRef, {
@@ -549,7 +549,7 @@ async function addArrayFieldToDocument(collectionID, documentName, fieldValue1, 
  * @function
  * @param {string} courseID - The course ID 
  */
-async function submitFile(courseID, index) {
+export async function submitFile(courseID, index) {
   // Get the file input element
   var fileInput = document.getElementById('formFileLg' + index);
   var baseNameInput = document.getElementById('fileName'+ index).value;
@@ -657,7 +657,7 @@ async function submitFile(courseID, index) {
  * @param {Object} user - The user object
  * @returns {Promise<DocumentSnapshot>} A database document snapshot
  */
-async function fetchDocument(user) {
+export async function fetchDocument(user) {
   const uid = user.uid;
   const docRef = doc(db, "users", uid);
   const docSnap = await getDoc(docRef);
@@ -672,7 +672,7 @@ async function fetchDocument(user) {
  * @param {Object} user - The user object
  * @returns {HTMLButtonElement} Created delete button
  */
-function createDeleteButton(fileName, filePath, user) {
+export function createDeleteButton(fileName, filePath, user) {
   const button = document.createElement('button');
   button.textContent = 'Delete';
   button.addEventListener('click', async () => {
@@ -689,7 +689,7 @@ function createDeleteButton(fileName, filePath, user) {
  * @param {string} courseID - ID for the course 
  * @param {string} quizName - The name of the quiz to delete
  */
-async function deleteQuiz(courseID, quizName) {
+export async function deleteQuiz(courseID, quizName) {
   const quizDocRef = doc(db, courseID, 'Quizzes', 'all-quizzes', quizName);
     try {
       await deleteDoc(quizDocRef);
@@ -707,7 +707,7 @@ async function deleteQuiz(courseID, quizName) {
  * @param {string} category - Category of the course
  * @param {string} filePath - The file path of the video to delete
  */
-async function deleteVideo(courseID, category, filePath, ) {
+export async function deleteVideo(courseID, category, filePath, ) {
   const docRef = doc(db, courseID, category);
     const docSnap = await getDoc(docRef);
     var videoArray = docSnap.data().videos;
@@ -734,7 +734,7 @@ async function deleteVideo(courseID, category, filePath, ) {
  * @param {string} category - Category of the course
  * @param {string} fileToDelete - The name of the file to delete
  */
-async function deleteExamOrLecture(courseID, category, fileToDelete) {
+export async function deleteExamOrLecture(courseID, category, fileToDelete) {
   const storageRef = ref(storage, `${courseID}/${category}/${fileToDelete}`);
     const docRef = doc(db, courseID, category);
 
@@ -757,7 +757,7 @@ async function deleteExamOrLecture(courseID, category, fileToDelete) {
  * @function
  * @param {string} fileName - Name of file to delete
  */
-async function deleteFromReferences(fileName) {
+export async function deleteFromReferences(fileName) {
   const user = await getCurrentUser();
   const uid = user.uid;
   const fileRef = doc(db, "users", uid);
@@ -783,7 +783,7 @@ async function deleteFromReferences(fileName) {
  * @param {string} fileName - Name of file to delete 
  * @param {string} filePath - The path of the file
  */
-async function deleteContent(fileName ,filePath) {
+export async function deleteContent(fileName ,filePath) {
   const pathsArray = filePath.split('/');
   const courseID = pathsArray[0];
   const category = pathsArray[1];
@@ -813,7 +813,7 @@ async function deleteContent(fileName ,filePath) {
  * @function
  * @param {Object} user - The user object
  */
-async function listUserContent(user) {
+export async function listUserContent(user) {
   const filesDiv = document.getElementById('files');
   filesDiv.innerHTML = 'Loading...';
 
