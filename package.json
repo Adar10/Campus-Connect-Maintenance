@@ -33,7 +33,7 @@
     "clean": "concurrently \"rm public\\bundle.js\" \"del public\\bundle.js\""
   },
   "jest": {
-    "testEnvironment": "node",
+    "testEnvironment": "jsdom",
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     }
