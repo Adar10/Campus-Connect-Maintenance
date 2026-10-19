@@ -26,16 +26,15 @@
 </head>
 
 <style>
-
     .alert {
-                width: 75%;
-                margin-left: 12.5%;
-                text-align: center;
-                z-index: 6;
-                position: fixed;
-                overflow: auto;
-        }
-        
+        width: 75%;
+        margin-left: 12.5%;
+        text-align: center;
+        z-index: 6;
+        position: fixed;
+        overflow: auto;
+    }
+
     .navbar .navbar-nav .nav-link:hover {
         background-color: gray;
         color: black;
@@ -95,6 +94,69 @@
         background-color: #eee;
         /* Add a hover effect to all links, except for headers */
     }
+
+    /* START OF MODAL CSS*/
+
+    /* The Modal (background) */
+    .modal {
+        display: none;
+        /* Hidden by default */
+        position: fixed;
+        /* Stay in place */
+        z-index: 5;
+        /* Sit on top */
+        padding-top: 100px;
+        /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%;
+        /* Full width */
+        height: 100%;
+        /* Full height */
+        overflow: auto;
+        /* Enable scroll if needed */
+        background-color: rgb(0, 0, 0);
+        /* Fallback color */
+        background-color: rgba(0, 0, 0, 0);
+        /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .alert {
+        width: 75%;
+        margin-left: 12.5%;
+        text-align: center;
+        z-index: 6;
+        position: fixed;
+        overflow: auto;
+    }
+
+
+
+    /*END OF MODAL CSS*/
 </style>
 
 <body class="bg-info-subtle" onload="set_name()">
@@ -212,7 +274,7 @@
 
     <script>
         var firebaseConfig = {
-            apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
+            apiKey: "process.env.FIREBASE_API_KEY",
             authDomain: "campusconnect-30c4a.firebaseapp.com",
             databaseURL: "https://campusconnect-30c4a-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "campusconnect-30c4a",
@@ -301,34 +363,34 @@
 
         function loginSuccess() {
             var loginMessage = document.getElementById("alert-loggedin");
-            
 
-                loginMessage.style.display = "block";
-                setTimeout(function() {
-                    loginMessage.style.display = "none";
-                }, 2800);
+
+            loginMessage.style.display = "block";
+            setTimeout(function () {
+                loginMessage.style.display = "none";
+            }, 2800);
         }
 
         function loginFailed() {
-             var loginMessage = document.getElementById("alert-failed");
-                
+            var loginMessage = document.getElementById("alert-failed");
+
             loginMessage.style.display = "block";
-            setTimeout(function() {
+            setTimeout(function () {
                 loginMessage.style.display = "none";
             }, 2800);
         }
 
         function loggedOut() {
-             var loginMessage = document.getElementById("alert-loggedout");
-                
+            var loginMessage = document.getElementById("alert-loggedout");
+
             loginMessage.style.display = "block";
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 loginMessage.style.display = "none";
             }, 2800);
         }
-            
-        
+
+
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
@@ -432,7 +494,7 @@
                             <hr class="mb-4 mt-0 d-inline-block mx-auto"
                                 style="width: 60px; background-color: #7c4dff; height: 2px" />
                             <p>
-                                <a href="frame3.html" class="text-white">Your Account</a>
+                                <a href="account.html" class="text-white">Your Account</a>
                             </p>
                             <p>
                                 <a href="#!" class="text-white">Uploading guidelines</a>
@@ -476,7 +538,38 @@
     </div>
     <!-- End of .container -->
 
+    <!--Start of Modal script-->
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
 
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        var link = document.getElementById("link");
+
+
+        // When the user clicks the button, open the modal 
+        link.addEventListener('click', () => {
+            modal.style.display = "block";
+        });
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+    <!--End of Modal script-->
 
 </body>
 

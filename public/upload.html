@@ -25,17 +25,16 @@
 
 </head>
 
-<style> 
-
+<style>
   .alert {
-              width: 75%;
-              margin-left: 12.5%;
-              text-align: center;
-              z-index: 6;
-              position: fixed;
-              overflow: auto;
-      }
-      
+    width: 75%;
+    margin-left: 12.5%;
+    text-align: center;
+    z-index: 6;
+    position: fixed;
+    overflow: auto;
+  }
+
   .navbar .navbar-nav .nav-link:hover {
     background-color: gray;
     color: black;
@@ -206,10 +205,10 @@
     <strong>Logged in successfully!</strong>
   </div>
   <div class="alert alert-danger" role="alert" id="alert-failed" style="display: none;">
-      <strong>Failed to login!</strong>
+    <strong>Failed to login!</strong>
   </div>
   <div class="alert alert-success" role="alert" id="alert-loggedout" style="display: none;">
-      <strong>Logged out successfully!</strong>
+    <strong>Logged out successfully!</strong>
   </div>
 
   <!--Start of header-->
@@ -372,71 +371,71 @@
       btn.innerHTML = "Login";
     }
 
-        function loginSuccess() {
-            var loginMessage = document.getElementById("alert-loggedin");
-            
+    function loginSuccess() {
+      var loginMessage = document.getElementById("alert-loggedin");
 
-                loginMessage.style.display = "block";
-                setTimeout(function() {
-                    loginMessage.style.display = "none";
-                }, 2800);
-        }
 
-        function loginFailed() {
-             var loginMessage = document.getElementById("alert-failed");
-                
-            loginMessage.style.display = "block";
-            setTimeout(function() {
-                loginMessage.style.display = "none";
-            }, 2800);
-        }
+      loginMessage.style.display = "block";
+      setTimeout(function () {
+        loginMessage.style.display = "none";
+      }, 2800);
+    }
 
-        function loggedOut() {
-             var loginMessage = document.getElementById("alert-loggedout");
-                
-            loginMessage.style.display = "block";
-            
-            setTimeout(function() {
-                loginMessage.style.display = "none";
-            }, 2800);
-        }
-            
-        
+    function loginFailed() {
+      var loginMessage = document.getElementById("alert-failed");
 
-        function signInWithGoogle() {
-            var provider = new firebase.auth.GoogleAuthProvider();
-            
-            disableLoginButton();
-            
-            firebase.auth().signInWithPopup(provider).then(function (result) {
-                var user = result.user;
-                console.log("Signed in", user);
-                enableLoginButton();
+      loginMessage.style.display = "block";
+      setTimeout(function () {
+        loginMessage.style.display = "none";
+      }, 2800);
+    }
 
-                loginSuccess();
+    function loggedOut() {
+      var loginMessage = document.getElementById("alert-loggedout");
 
-                document.getElementById("login_status").innerHTML = "Logout";
-                change();
+      loginMessage.style.display = "block";
 
-            }).catch(function (error) {
-                console.error(error);
-                loginFailed();
-                enableLoginButton();
-                
-                
-                document.getElementById("login_status").innerHTML = "Login";
-            });
-        }
+      setTimeout(function () {
+        loginMessage.style.display = "none";
+      }, 2800);
+    }
 
-        function signOutWithGoogle() {
-            firebase.auth().signOut().then(() => {
-                console.log("Signed out");
-                loggedOut();
-                document.getElementById("login_status").innerHTML = "Login"
-            }).catch((error) => {
-                console.error(error);
-            });
-        }
+
+
+    function signInWithGoogle() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+
+      disableLoginButton();
+
+      firebase.auth().signInWithPopup(provider).then(function (result) {
+        var user = result.user;
+        console.log("Signed in", user);
+        enableLoginButton();
+
+        loginSuccess();
+
+        document.getElementById("login_status").innerHTML = "Logout";
+        change();
+
+      }).catch(function (error) {
+        console.error(error);
+        loginFailed();
+        enableLoginButton();
+
+
+        document.getElementById("login_status").innerHTML = "Login";
+      });
+    }
+
+    function signOutWithGoogle() {
+      firebase.auth().signOut().then(() => {
+        console.log("Signed out");
+        loggedOut();
+        document.getElementById("login_status").innerHTML = "Login"
+      }).catch((error) => {
+        console.error(error);
+      });
+    }
 
     //document.getElementById('googleSignInButton').addEventListener('click', event_login);
 
@@ -447,7 +446,7 @@
         console.log("User is signed in");
       } else {
         console.log("User is signed out");
-        window.location.href = "upload_login.html";
+        //window.location.href = "upload_login.html";
       }
     })
   </script>
@@ -507,7 +506,7 @@
               <hr class="mb-4 mt-0 d-inline-block mx-auto"
                 style="width: 60px; background-color: #7c4dff; height: 2px" />
               <p>
-                <a href="frame3.html" class="text-white">Your Account</a>
+                <a href="account.html" class="text-white">Your Account</a>
               </p>
               <p>
                 <a id="link" href="#myModal" class="text-white">Uploading guidelines</a>

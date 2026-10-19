@@ -81,7 +81,7 @@
             /* Add a hover effect to all links, except for headers */
         }
 
-        .modal-body {
+        #addQuizModal-body {
             padding: 20px;
             /* Add padding to the modal body */
             background-color: #f9f9f9;
@@ -91,7 +91,7 @@
         }
 
         /* Style the input field */
-        .modal-body input[type="text"] {
+        #addQuizModal-body input[type="text"] {
             width: 100%;
             /* Full width for the input field */
             padding: 10px;
@@ -107,7 +107,7 @@
         }
 
         /* Style the buttons */
-        .modal-body .btn {
+        #addQuizModal-body .btn {
             margin-right: 10px;
             /* Margin between buttons */
             border-radius: 5px;
@@ -117,7 +117,7 @@
         }
 
         /* Style the confirmation message */
-        .modal-body #confirmation-message {
+        #addQuizModal-body #confirmation-message {
             color: rgb(80, 162, 92);
             /* Green color for the confirmation message */
             position: absolute;
@@ -167,7 +167,7 @@
 
         #add-quiz-btn:hover {
             background-color: #eee;
-        }   
+        }
 
         .alert {
             width: 75%;
@@ -178,6 +178,69 @@
             overflow: auto;
         }
 
+        /* START OF MODAL CSS*/
+
+        /* The Modal (background) */
+
+        #myModal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            /* Stay in place */
+            z-index: 5;
+            /* Sit on top */
+            padding-top: 100px;
+            /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            /* Full width */
+            height: 100%;
+            /* Full height */
+            overflow: auto;
+            /* Enable scroll if needed */
+            background-color: rgb(0, 0, 0);
+            /* Fallback color */
+            background-color: rgba(0, 0, 0, 0);
+            /* Black w/ opacity */
+        }
+
+        /* Modal Content */
+        #myModal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        /* The Close Button */
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .alert {
+            width: 75%;
+            margin-left: 12.5%;
+            text-align: center;
+            z-index: 6;
+            position: fixed;
+            overflow: auto;
+        }
+
+
+
+        /*END OF MODAL CSS*/
     </style>
 
 
@@ -216,10 +279,10 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="google_event()" id="login_status"></a>
-                    
+
                 </li>
             </ul>
-            
+
         </div>
     </nav>
 
@@ -238,7 +301,7 @@
     <div class="alert alert-success" role="alert" id="alert-loggedout" style="display: none;">
         <strong>Logged out successfully!</strong>
     </div>
- 
+
 
     <script type="text/javascript">
         var courseName = localStorage.getItem("course");
@@ -380,7 +443,16 @@
     </script>
 
 
+    <!-- Start of Modal -->
+    <div id="myModal" class="modal">
 
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h5>Uploading guidelines and restrictions</h5>
+            <p>Some text in the Modal..</p>
+        </div>
+    </div>
+    <!-- End of Modal -->
 
     <!-- Firebase configuration and other scripts -->
     <script>
@@ -428,7 +500,7 @@
             var status = localStorage.getItem("myVariable");
             if (status === "false") {
                 event_login();
-                
+
 
             }
             else {
@@ -476,34 +548,34 @@
 
         function loginSuccess() {
             var loginMessage = document.getElementById("alert-loggedin");
-            
 
-                loginMessage.style.display = "block";
-                setTimeout(function() {
-                    loginMessage.style.display = "none";
-                }, 2800);
+
+            loginMessage.style.display = "block";
+            setTimeout(function () {
+                loginMessage.style.display = "none";
+            }, 2800);
         }
 
         function loginFailed() {
-             var loginMessage = document.getElementById("alert-failed");
-                
+            var loginMessage = document.getElementById("alert-failed");
+
             loginMessage.style.display = "block";
-            setTimeout(function() {
+            setTimeout(function () {
                 loginMessage.style.display = "none";
             }, 2800);
         }
 
         function loggedOut() {
-             var loginMessage = document.getElementById("alert-loggedout");
-                
+            var loginMessage = document.getElementById("alert-loggedout");
+
             loginMessage.style.display = "block";
-            
-            setTimeout(function() {
+
+            setTimeout(function () {
                 loginMessage.style.display = "none";
             }, 2800);
         }
-            
-        
+
+
 
         function signInWithGoogle() {
             var provider = new firebase.auth.GoogleAuthProvider();
@@ -546,7 +618,7 @@
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 console.log("User is signed in");
-               
+
             } else {
                 console.log("User is signed out");
             }
@@ -623,7 +695,7 @@
                             <hr class="mb-4 mt-0 d-inline-block mx-auto"
                                 style="width: 60px; background-color: #7c4dff; height: 2px" />
                             <p>
-                                <a href="frame3.html" class="text-white">Your Account</a>
+                                <a href="account.html" class="text-white">Your Account</a>
                             </p>
                             <p>
                                 <a id="link" class="text-white" href="#myModal">Uploading guidelines</a>
@@ -666,6 +738,39 @@
 
     </div>
     <!-- End of .container -->
+
+    <!--Start of Modal script -->
+    <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        var link = document.getElementById("link");
+
+
+        // When the user clicks the button, open the modal 
+        link.addEventListener('click', () => {
+            modal.style.display = "block";
+        });
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+    <!--End of Modal script-->
 
     <!-- Footer content goes here -->
 </body>

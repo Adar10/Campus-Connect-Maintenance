@@ -24,7 +24,7 @@ import { getStorage, ref, exists, getDownloadURL, uploadString, uploadBytes } fr
 
 // Firebase configuration object
 const firebaseConfig = {
-  apiKey: "AIzaSyAjWnGy2HpTFM-07fRp3VIokULmU_dyMg4",
+  apiKey: "process.env.FIREBASE_API_KEY",
   authDomain: "campusconnect-30c4a.firebaseapp.com",
   databaseURL: "https://campusconnect-30c4a-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "campusconnect-30c4a",
@@ -45,7 +45,7 @@ const auth = getAuth(firebaseApp);
 // Get a reference to the storage service
 const storage = getStorage();
 
-export { storage, db };
+export { storage, db, firebaseApp };
 
 let currentUser = null;
 
